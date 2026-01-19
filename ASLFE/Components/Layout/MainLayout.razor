@@ -1,20 +1,54 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
+<header class="game-header">
+    <div class="header-container">
+        <a href="/" class="logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="logo-icon">
+                <circle cx="8" cy="8" r="3" />
+                <circle cx="8" cy="16" r="3" />
+                <circle cx="16" cy="8" r="3" />
+                <circle cx="16" cy="16" r="3" />
+            </svg>
+        </a>
+
+        <nav class="main-nav">
+            <div class="nav-item dropdown">
+                <button class="nav-button">
+                    Gameplay
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="dropdown-icon">
+                        <path d="M7 10l5 5 5-5z" />
+                    </svg>
+                </button>
+            </div>
+
+            <a href="/news" class="nav-item">News</a>
+
+            <div class="nav-item dropdown">
+                <button class="nav-button">
+                    Shop
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="dropdown-icon">
+                        <path d="M7 10l5 5 5-5z" />
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <div class="header-actions">
+            <a href="/signin" class="btn-signin">Sign in</a>
+            <a href="/register" class="btn-register">Register</a>
+        </div>
+    </div>
+</header>
+
+
+@* 
     <div class="sidebar">
         <NavMenu />
     </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+ *@
+<main>
+    @Body
+</main>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.

@@ -1,13 +1,138 @@
-﻿.game-intro-container {
+﻿/* Game Header */
+.game-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: #000000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0;
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 50px;
+    height: 56px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    color: white;
+}
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex: 1;
+    margin-left: 60px;
+}
+
+.nav-item {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+    .nav-item:hover {
+        color: #ff6b35;
+    }
+
+.dropdown {
+    position: relative;
+}
+
+.nav-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: white;
+    background: none;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+    .nav-button:hover {
+        color: #ff6b35;
+    }
+
+.dropdown-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-signin,
+.btn-register {
+    padding: 8px 24px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-signin {
+    color: white;
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+    .btn-signin:hover {
+        border-color: white;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+.btn-register {
+    color: white;
+    background-color: #ff6b35;
+    border-color: #ff6b35;
+}
+
+    .btn-register:hover {
+        background-color: #ff7e4f;
+        border-color: #ff7e4f;
+    }
+
+.game-intro-container {
     background-color: #0a0a0a;
     color: #ffffff;
     min-height: 100vh;
+    padding-top: 56px; /* Height of fixed header */
 }
 
 /* Hero Section */
 .hero-section {
     position: relative;
-    min-height: 100vh;
+    min-height: 70vh; /* reduced from 100vh to calm the height */
     background: linear-gradient(135deg, #1a0a00 0%, #4a1a00 50%, #2a0a00 100%);
     background-image: url('/images/hero-background.jpg');
     background-size: cover;
@@ -28,33 +153,40 @@
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
 }
 
+/* Make hero content span full width and position bottom-left / bottom-right */
 .hero-content {
-    position: relative;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 32px; /* slightly lifted content to match reduced hero height */
     z-index: 2;
-    text-align: center;
-    max-width: 800px;
-    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 60px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-.hero-title {
-    font-size: 4rem;
-    font-weight: 900;
-    margin: 0 0 20px;
-    text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.8);
-    letter-spacing: 2px;
+.hero-bottom-left {
+    max-width: 60%;
+    color: white;
+    text-align: left;
 }
 
-.hero-subtitle {
-    font-size: 1.25rem;
-    line-height: 1.8;
-    margin-bottom: 40px;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+.hero-bottom-left .hero-title {
+    margin: 0 0 12px 0;
 }
 
-    .hero-subtitle strong {
-        color: #ff6b35;
-        font-weight: 700;
-    }
+.hero-bottom-left .hero-subtitle {
+    margin: 0 0 18px 0;
+}
+
+.hero-bottom-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
 
 .cta-button {
     display: inline-block;
@@ -69,7 +201,7 @@
     letter-spacing: 1px;
     transition: all 0.3s ease;
     box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
-    margin-right: 20px;
+    margin-right: 0;
 }
 
     .cta-button:hover {
@@ -80,7 +212,7 @@
 
 .learn-more {
     display: inline-block;
-    padding: 16px 48px;
+    padding: 12px 32px;
     border: 2px solid rgba(255, 255, 255, 0.5);
     color: white;
     text-decoration: none;
@@ -96,20 +228,30 @@
 
 .hero-image {
     position: absolute;
-    right: 5%;
     bottom: 0;
-    width: 40%;
-    max-width: 600px;
+    width: auto; /* let image scale based on max dimensions */
+    max-width: 65%; /* limit horizontal expansion */
+    height: auto; /* don't force full-height stretch */
+    max-height: 65vh; /* cap vertical size to prevent upscaling */
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
     z-index: 1;
-    opacity: 0.9;
+    opacity: 0.97;
+    transform: translateX(2%);
 }
 
     .hero-image img {
-        width: 100%;
+        width: auto;
         height: auto;
-        filter: drop-shadow(0 0 30px rgba(255, 107, 53, 0.5));
+        max-height: 65vh; /* match hero-image max height */
+        max-width: 100%;
+        object-fit: contain; /* avoid cropping and keep original aspect ratio */
+        display: block;
+        filter: drop-shadow(0 0 40px rgba(255, 107, 53, 0.5));
+        transform: translate(-2%,-3%);
+        border-radius: 0;
     }
-
 /* Introduction Section */
 .introduction-section {
     padding: 100px 50px;
@@ -324,6 +466,30 @@
 
 /* Responsive Design */
 @media (max-width: 1200px) {
+    .hero-content {
+        max-width: 620px; /* allow more content room on medium screens */
+        left: 0;
+        right: 0;
+        bottom: 40px;
+        padding: 0 40px;
+    }
+
+    .hero-image {
+        width: 75%;
+        right: 0; /* keep inside viewport on medium screens */
+        height: auto;
+        max-height: 55vh; /* lower cap for medium screens */
+        align-items: center;
+        transform: translateX(0); /* reset transform for medium screens */
+    }
+
+    .hero-image img {
+        height: auto;
+        width: auto;
+        max-height: 55vh;
+        max-width: 100%;
+    }
+
     .hero-title {
         font-size: 3rem;
     }
@@ -333,21 +499,36 @@
     }
 
     .hero-image {
-        width: 50%;
+        width: 55%;
+        max-height: 55vh;
+        bottom: 0;
     }
 
     .game-categories {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .header-container {
+        padding: 0 30px;
+    }
 }
 
 @media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
+    /* revert to stacked centered layout on small screens */
+    .hero-content {
+        position: relative;
+        bottom: auto;
+        display: block;
+        text-align: center;
+        padding: 20px;
+        max-width: 520px;
+        margin: 0 auto;
     }
 
-    .hero-subtitle {
-        font-size: 1rem;
+    .hero-bottom-left, .hero-bottom-right {
+        max-width: 100%;
+        text-align: center;
+        margin-bottom: 12px;
     }
 
     .hero-image {
@@ -388,5 +569,29 @@
     .map-legend {
         position: static;
         margin-top: 20px;
+    }
+
+    /* Header Mobile */
+    .header-container {
+        padding: 0 20px;
+    }
+
+    .main-nav {
+        display: none;
+    }
+
+    .logo-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .header-actions {
+        gap: 10px;
+    }
+
+    .btn-signin,
+    .btn-register {
+        padding: 6px 16px;
+        font-size: 13px;
     }
 }
