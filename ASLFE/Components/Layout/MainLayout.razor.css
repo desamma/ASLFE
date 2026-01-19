@@ -154,9 +154,10 @@
     display: inline-block;
 }
 
-.btn-register:hover {
-    background: #b5f28c;
-}
+    .btn-register:hover {
+        background: #9e9e9e;
+        color: #fff;
+    }
 
 @media (max-width: 640.98px) {
     .main-nav {
