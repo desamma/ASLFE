@@ -1,0 +1,597 @@
+﻿/* Game Header */
+.game-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background-color: #000000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0;
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 50px;
+    height: 56px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    color: white;
+}
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex: 1;
+    margin-left: 60px;
+}
+
+.nav-item {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+    .nav-item:hover {
+        color: #ff6b35;
+    }
+
+.dropdown {
+    position: relative;
+}
+
+.nav-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: white;
+    background: none;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease;
+}
+
+    .nav-button:hover {
+        color: #ff6b35;
+    }
+
+.dropdown-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-signin,
+.btn-register {
+    padding: 8px 24px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.btn-signin {
+    color: white;
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+    .btn-signin:hover {
+        border-color: white;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+.btn-register {
+    color: white;
+    background-color: #ff6b35;
+    border-color: #ff6b35;
+}
+
+    .btn-register:hover {
+        background-color: #ff7e4f;
+        border-color: #ff7e4f;
+    }
+
+.game-intro-container {
+    background-color: #0a0a0a;
+    color: #ffffff;
+    min-height: 100vh;
+    padding-top: 56px; /* Height of fixed header */
+}
+
+/* Hero Section */
+.hero-section {
+    position: relative;
+    min-height: 70vh; /* reduced from 100vh to calm the height */
+    background: linear-gradient(135deg, #1a0a00 0%, #4a1a00 50%, #2a0a00 100%);
+    background-image: url('/images/hero-background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7));
+}
+
+/* Make hero content span full width and position bottom-left / bottom-right */
+.hero-content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 32px; /* slightly lifted content to match reduced hero height */
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.hero-bottom-left {
+    max-width: 60%;
+    color: white;
+    text-align: left;
+}
+
+.hero-bottom-left .hero-title {
+    margin: 0 0 12px 0;
+}
+
+.hero-bottom-left .hero-subtitle {
+    margin: 0 0 18px 0;
+}
+
+.hero-bottom-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, #ff6b35 0%, #d4521a 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+    margin-right: 0;
+}
+
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(255, 107, 53, 0.6);
+        background: linear-gradient(135deg, #ff7e4f 0%, #e65c2a 100%);
+    }
+
+.learn-more {
+    display: inline-block;
+    padding: 12px 32px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .learn-more:hover {
+        border-color: white;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+.hero-image {
+    position: absolute;
+    bottom: 0;
+    width: auto; /* let image scale based on max dimensions */
+    max-width: 65%; /* limit horizontal expansion */
+    height: auto; /* don't force full-height stretch */
+    max-height: 65vh; /* cap vertical size to prevent upscaling */
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1;
+    opacity: 0.97;
+    transform: translateX(2%);
+}
+
+    .hero-image img {
+        width: auto;
+        height: auto;
+        max-height: 65vh; /* match hero-image max height */
+        max-width: 100%;
+        object-fit: contain; /* avoid cropping and keep original aspect ratio */
+        display: block;
+        filter: drop-shadow(0 0 40px rgba(255, 107, 53, 0.5));
+        transform: translate(-2%,-3%);
+        border-radius: 0;
+    }
+/* Introduction Section */
+.introduction-section {
+    padding: 100px 50px;
+    background: linear-gradient(to bottom, #1a1a1a 0%, #2a2a2a 100%);
+}
+
+.intro-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.intro-text h2 {
+    font-size: 3rem;
+    margin-bottom: 30px;
+    color: #ff6b35;
+}
+
+.intro-text p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #cccccc;
+}
+
+.intro-image {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+    .intro-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .intro-image:hover img {
+        transform: scale(1.05);
+    }
+
+/* Explore Section */
+.explore-section {
+    padding: 100px 50px;
+    background: linear-gradient(to bottom, #0a0a0a 0%, #1a1a1a 100%);
+    text-align: center;
+}
+
+    .explore-section h2 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        color: #ff6b35;
+    }
+
+.explore-subtitle {
+    font-size: 1.2rem;
+    color: #cccccc;
+    margin-bottom: 60px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.explore-content {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.world-map {
+    position: relative;
+    margin-bottom: 60px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+    .world-map img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+.map-legend {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+    .legend-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .legend-item .icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        color: #ff6b35;
+    }
+
+.feature-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: #1a1a1a;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(255, 107, 53, 0.3);
+    }
+
+    .feature-card img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+    }
+
+    .feature-card p {
+        padding: 20px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: center;
+    }
+
+/* About Game Section */
+.about-game-section {
+    padding: 100px 50px;
+    background: linear-gradient(to bottom, #1a1a1a 0%, #0a0a0a 100%);
+}
+
+    .about-game-section h2 {
+        font-size: 3rem;
+        text-align: center;
+        margin-bottom: 60px;
+        color: #ff6b35;
+    }
+
+.game-categories {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 60px;
+}
+
+.category-group h3 {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    color: #ffffff;
+    border-bottom: 2px solid #ff6b35;
+    padding-bottom: 10px;
+}
+
+.category-links {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.category-link {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(255, 107, 53, 0.1);
+    border: 2px solid rgba(255, 107, 53, 0.3);
+    border-radius: 10px;
+    color: #ffffff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+    .category-link:hover {
+        background: rgba(255, 107, 53, 0.2);
+        border-color: #ff6b35;
+        transform: translateX(10px);
+    }
+
+    .category-link svg {
+        width: 24px;
+        height: 24px;
+        margin-right: 15px;
+        color: #ff6b35;
+    }
+
+    .category-link span {
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .hero-content {
+        max-width: 620px; /* allow more content room on medium screens */
+        left: 0;
+        right: 0;
+        bottom: 40px;
+        padding: 0 40px;
+    }
+
+    .hero-image {
+        width: 75%;
+        right: 0; /* keep inside viewport on medium screens */
+        height: auto;
+        max-height: 55vh; /* lower cap for medium screens */
+        align-items: center;
+        transform: translateX(0); /* reset transform for medium screens */
+    }
+
+    .hero-image img {
+        height: auto;
+        width: auto;
+        max-height: 55vh;
+        max-width: 100%;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+    }
+
+    .intro-container {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-image {
+        width: 55%;
+        max-height: 55vh;
+        bottom: 0;
+    }
+
+    .game-categories {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .header-container {
+        padding: 0 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* revert to stacked centered layout on small screens */
+    .hero-content {
+        position: relative;
+        bottom: auto;
+        display: block;
+        text-align: center;
+        padding: 20px;
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    .hero-bottom-left, .hero-bottom-right {
+        max-width: 100%;
+        text-align: center;
+        margin-bottom: 12px;
+    }
+
+    .hero-image {
+        display: none;
+    }
+
+    .cta-button {
+        display: block;
+        margin: 10px auto;
+    }
+
+    .learn-more {
+        display: block;
+        margin: 10px auto;
+    }
+
+    .introduction-section,
+    .explore-section,
+    .about-game-section {
+        padding: 60px 20px;
+    }
+
+        .intro-text h2,
+        .explore-section h2,
+        .about-game-section h2 {
+            font-size: 2rem;
+        }
+
+    .feature-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .game-categories {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .map-legend {
+        position: static;
+        margin-top: 20px;
+    }
+
+    /* Header Mobile */
+    .header-container {
+        padding: 0 20px;
+    }
+
+    .main-nav {
+        display: none;
+    }
+
+    .logo-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .header-actions {
+        gap: 10px;
+    }
+
+    .btn-signin,
+    .btn-register {
+        padding: 6px 16px;
+        font-size: 13px;
+    }
+}
