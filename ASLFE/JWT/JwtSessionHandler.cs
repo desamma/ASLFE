@@ -13,10 +13,17 @@ namespace ASLFE.JWT
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            var requestPath = request.RequestUri?.AbsolutePath ?? string.Empty;
+            var isAuthEndpoint = requestPath.Contains("/api/auth/register", StringComparison.OrdinalIgnoreCase)||
+                                requestPath.Contains("/api/auth/signin", StringComparison.OrdinalIgnoreCase);
+
+            if(isAuthEndpoint) return base.SendAsync(request, cancellationToken);
+
             var httpCtx = _httpContextAccessor.HttpContext;
             var token = httpCtx?.Session.GetString("AccessToken");
 
-            if (!string.IsNullOrWhiteSpace(token))
+
+            if (!string.IsNullOrWhiteSpace(token) && !isAuthEndpoint)
             {
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }

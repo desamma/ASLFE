@@ -1,4 +1,5 @@
 @page "/register"
+@rendermode InteractiveServer
 @using System.Net.Http.Json
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authentication
@@ -15,44 +16,36 @@
         <div class="signin-card">
             <h1 class="signin-title">Create an account</h1>
 
-            <EditForm Model="@registerModel" OnValidSubmit="@HandleRegister" class="signin-form">
+            <EditForm Model="@registerModel" FormName="RegisterForm" OnValidSubmit="@HandleRegister" class="signin-form">
                 <DataAnnotationsValidator />
-                <ValidationSummary/>
-
+                <ValidationSummary />
                 @if (!string.IsNullOrEmpty(errorMessage))
                 {
                     <div class="validation-message" style="color: #b00020; font-weight:600">@errorMessage</div>
                 }
 
-                <div class="form-group">
-                    <input @bind="registerModel.Username"
-                           class="form-input"
-                           placeholder="Username"
-                           aria-label="Username" />
-                </div>
+                <input name="Username"
+                       @bind="registerModel.Username"
+                       class="form-input"
+                       placeholder="Username" />
 
-                <div class="form-group">
-                    <input @bind="registerModel.Email"
-                           class="form-input"
-                           placeholder="Email"
-                           aria-label="Email" />
-                </div>
+                <input name="Email"
+                       @bind="registerModel.Email"
+                       class="form-input"
+                       placeholder="Email" />
 
-                <div class="form-group">
-                    <input type="password"
-                           @bind="registerModel.Password"
-                           class="form-input"
-                           placeholder="Password"
-                           aria-label="Password" />
-                </div>
+                <input name="Password"
+                       type="password"
+                       @bind="registerModel.Password"
+                       class="form-input"
+                       placeholder="Password" />
 
-                <div class="form-group">
-                    <input type="password"
-                           @bind="registerModel.ConfirmPassword"
-                           class="form-input"
-                           placeholder="Confirm Password"
-                           aria-label="Confirm Password" />
-                </div>
+                <input name="ConfirmPassword"
+                       type="password"
+                       @bind="registerModel.ConfirmPassword"
+                       class="form-input"
+                       placeholder="Confirm Password" />
+
 
                 <button type="submit" class="btn-login" disabled="@isLoading">@((isLoading) ? "Registering..." : "Register")</button>
             </EditForm>
@@ -65,10 +58,38 @@
     </div>
 </div>
 
+@if (showModal)
+{
+    <div class="modal-overlay" @onclick="CloseModal">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h2 class="modal-title">@(isSuccess ? "Success" : "Error")</h2>
+                <button class="modal-close" @onclick="CloseModal" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>@modalMessage</p>
+            </div>
+            <div class="modal-footer">
+                @if (isSuccess)
+                {
+                    <button class="modal-btn modal-btn-primary" @onclick="NavigateToSignIn">Go to Sign In</button>
+                }
+                else
+                {
+                    <button class="modal-btn modal-btn-secondary" @onclick="CloseModal">Close</button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private RegisterModel registerModel = new();
     private bool isLoading = false;
     private string errorMessage = string.Empty;
+    private bool showModal = false;
+    private string modalMessage = string.Empty;
+    private bool isSuccess = false;
 
     private async Task HandleRegister()
     {
@@ -87,69 +108,60 @@
 
             var response = await httpClient.PostAsJsonAsync("api/auth/register", registerModel);
 
+            var registerResponse = await response.Content.ReadFromJsonAsync<RegisterResponse>();
+
             if (response.IsSuccessStatusCode)
             {
-                var registerResponse = await response.Content.ReadFromJsonAsync<RegisterResponse>();
-
-                if (registerResponse != null && !string.IsNullOrEmpty(registerResponse.Token))
+                if (registerResponse != null)
                 {
-                    var httpContext = HttpContextAccessor.HttpContext;
-                    if (httpContext != null)
-                    {
-                        httpContext.Session.SetString("JwtToken", registerResponse.Token);
-
-                        var claims = new List<Claim>
-                        {
-                            new Claim(ClaimTypes.NameIdentifier, registerResponse.UserId.ToString()),
-                            new Claim(ClaimTypes.Name, registerResponse.Username),
-                            new Claim(ClaimTypes.Email, registerResponse.Email ?? string.Empty),
-                            new Claim("Avatar", registerResponse.Avatar ?? string.Empty),
-                            new Claim("Gender", registerResponse.Gender.ToString()),
-                        };
-
-                        if (registerResponse.Roles != null)
-                        {
-                            foreach (var role in registerResponse.Roles)
-                            {
-                                claims.Add(new Claim(ClaimTypes.Role, role));
-                            }
-                        }
-
-                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-                        await httpContext.SignInAsync(
-                            CookieAuthenticationDefaults.AuthenticationScheme,
-                            claimsPrincipal,
-                            new AuthenticationProperties
-                            {
-                                IsPersistent = true,
-                                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(12)
-                            });
-
-                        Navigation.NavigateTo("/", forceLoad: true);
-                    }
+                    isSuccess = true;
+                    modalMessage = registerResponse.message ?? "Registration successful! You can now sign in.";
+                    showModal = true;
                 }
                 else
                 {
-                    errorMessage = "Registration failed. Please try again.";
+                    isSuccess = false;
+                    modalMessage = "Registration failed. Please try again.";
+                    showModal = true;
                 }
             }
             else
             {
-                var errorResponse = await response.Content.ReadAsStringAsync();
-                // Prefer server-provided message if available
-                errorMessage = string.IsNullOrWhiteSpace(errorResponse) ? "Registration failed. Please check your details." : errorResponse;
+                try
+                {
+                    isSuccess = false;
+                    modalMessage = registerResponse?.message ?? "Registration failed. Please check your details.";
+                    showModal = true;
+                }
+                catch
+                {
+                    var errorText = await response.Content.ReadAsStringAsync();
+                    isSuccess = false;
+                    modalMessage = "Registration failed. Please check your details.";
+                    showModal = true;
+                }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            errorMessage = "An error occurred during registration. Please try again.";
+            isSuccess = false;
+            modalMessage = "An error occurred during registration. Please try again.";
+            showModal = true;
         }
         finally
         {
             isLoading = false;
         }
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+    }
+
+    private void NavigateToSignIn()
+    {
+        Navigation.NavigateTo("/signin", forceLoad: true);
     }
 
     public class RegisterModel
@@ -173,12 +185,6 @@
 
     public class RegisterResponse
     {
-        public string Token { get; set; } = string.Empty;
-        public Guid UserId { get; set; }
-        public string Username { get; set; } = string.Empty;
-        public string? Email { get; set; }
-        public string? Avatar { get; set; }
-        public byte Gender { get; set; }
-        public List<string>? Roles { get; set; }
+        public string message { get; set; } = string.Empty;
     }
 }
