@@ -66,7 +66,8 @@
     width: 100%;
 }
 
-.form-input {
+/* Use ::deep to penetrate InputText component boundary */
+::deep .form-input {
     width: 100%;
     padding: 16px 20px;
     border: 2px solid rgba(0, 0, 0, 0.08);
@@ -79,17 +80,17 @@
     font-family: inherit;
 }
 
-    .form-input::placeholder {
+    ::deep .form-input::placeholder {
         color: #999;
         font-weight: 500;
         opacity: 1;
     }
 
-    .form-input:hover {
+    ::deep .form-input:hover {
         border-color: rgba(0, 0, 0, 0.15);
     }
 
-    .form-input:focus {
+    ::deep .form-input:focus {
         outline: none;
         border-color: #f5a623;
         box-shadow: 0 0 0 4px rgba(245, 166, 35, 0.12);
@@ -175,6 +176,173 @@
         border-radius: 2px;
     }
 
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: linear-gradient(to bottom, rgba(250, 245, 235, 0.98), rgba(245, 240, 230, 0.98));
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 100%;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+    border: 1px solid rgba(245, 166, 35, 0.2);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    padding: 28px 32px;
+    border-bottom: 2px solid rgba(245, 166, 35, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: -0.3px;
+}
+
+.modal-close {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 400;
+}
+
+    .modal-close:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-color: rgba(0, 0, 0, 0.15);
+        color: #1a1a1a;
+    }
+
+    .modal-close:focus {
+        outline: 2px solid #f5a623;
+        outline-offset: 2px;
+    }
+
+.modal-body {
+    padding: 32px;
+    background: transparent;
+}
+
+    .modal-body p {
+        margin: 0;
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #2a2a2a;
+        font-weight: 500;
+    }
+
+.modal-footer {
+    padding: 24px 32px;
+    border-top: 2px solid rgba(245, 166, 35, 0.15);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: transparent;
+}
+
+.modal-btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    letter-spacing: 0.2px;
+}
+
+.modal-btn-primary {
+    background: linear-gradient(135deg, #f5a623 0%, #e89b1f 100%);
+    color: #1a1a1a;
+    box-shadow: 0 4px 12px rgba(245, 166, 35, 0.25);
+}
+
+    .modal-btn-primary:hover {
+        background: linear-gradient(135deg, #f7b13d 0%, #ea9f2a 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 166, 35, 0.4);
+    }
+
+    .modal-btn-primary:active {
+        transform: translateY(0);
+        box-shadow: 0 3px 10px rgba(245, 166, 35, 0.3);
+    }
+
+.modal-btn-secondary {
+    background: rgba(0, 0, 0, 0.06);
+    color: #333;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+    .modal-btn-secondary:hover {
+        background: rgba(0, 0, 0, 0.1);
+        border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-btn-secondary:active {
+        background: rgba(0, 0, 0, 0.08);
+    }
+
+    .modal-btn-secondary:focus,
+    .modal-btn-primary:focus {
+        outline: 2px solid #f5a623;
+        outline-offset: 2px;
+    }
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .signin-container {
@@ -196,7 +364,7 @@
         margin-bottom: 28px;
     }
 
-    .form-input {
+    ::deep .form-input {
         padding: 14px 18px;
         font-size: 1rem;
         border-radius: 8px;
@@ -220,6 +388,32 @@
         left: 50%;
         transform: translateX(-50%);
     }
+
+    .modal-content {
+        margin: 0 16px;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: 20px;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+    }
+
+    .modal-body p {
+        font-size: 1rem;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .modal-btn {
+        width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
@@ -231,7 +425,7 @@
         padding: 28px 20px;
     }
 
-    .form-input {
+    ::deep .form-input {
         padding: 12px 16px;
         font-size: 0.95rem;
     }
@@ -254,7 +448,7 @@
 }
 
 /* Focus visible for keyboard navigation */
-.form-input:focus-visible,
+::deep .form-input:focus-visible,
 .btn-login:focus-visible,
 .signin-link:focus-visible {
     outline: 2px solid #f5a623;
