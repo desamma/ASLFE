@@ -15,7 +15,7 @@ namespace ASLFE.JWT
         {
             var requestPath = request.RequestUri?.AbsolutePath ?? string.Empty;
             var isAuthEndpoint = requestPath.Contains("/api/auth/register", StringComparison.OrdinalIgnoreCase)||
-                                requestPath.Contains("/api/auth/signin", StringComparison.OrdinalIgnoreCase);
+                                requestPath.Contains("/api/auth/login", StringComparison.OrdinalIgnoreCase);
 
             if(isAuthEndpoint) return base.SendAsync(request, cancellationToken);
 

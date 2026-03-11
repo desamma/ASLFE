@@ -19,30 +19,31 @@
             <EditForm Model="@registerModel" FormName="RegisterForm" OnValidSubmit="@HandleRegister" class="signin-form">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
+                
                 @if (!string.IsNullOrEmpty(errorMessage))
                 {
                     <div class="validation-message" style="color: #b00020; font-weight:600">@errorMessage</div>
                 }
 
-                <input name="Username"
-                       @bind="registerModel.Username"
+                <InputText name="Username"
+                       @bind-Value="registerModel.Username"
                        class="form-input"
                        placeholder="Username" />
 
-                <input name="Email"
-                       @bind="registerModel.Email"
+                <InputText name="Email"
+                       @bind-Value="registerModel.Email"
                        class="form-input"
                        placeholder="Email" />
 
-                <input name="Password"
+                <InputText name="Password"
                        type="password"
-                       @bind="registerModel.Password"
+                       @bind-Value="registerModel.Password"
                        class="form-input"
                        placeholder="Password" />
 
-                <input name="ConfirmPassword"
+                <InputText name="ConfirmPassword"
                        type="password"
-                       @bind="registerModel.ConfirmPassword"
+                       @bind-Value="registerModel.ConfirmPassword"
                        class="form-input"
                        placeholder="Confirm Password" />
 

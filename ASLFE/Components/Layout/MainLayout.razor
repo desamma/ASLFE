@@ -1,4 +1,6 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inherits LayoutComponentBase
 
 <header class="game-header">
     <div class="header-container">
@@ -33,14 +35,41 @@
             </div>
         </nav>
 
-        <div class="header-actions">
-            <a href="/signin" class="btn-signin">Sign in</a>
-            <a href="/register" class="btn-register">Register</a>
-        </div>
+        <AuthorizeView>
+            <Authorized>
+                <div class="user-profile-group" style="display: flex; align-items: center; gap: 12px;">
+
+                    @* Display Avatar if it exists, otherwise a default icon *@
+                    @{
+                        var avatarUrl = context.User.FindFirst("Avatar")?.Value;
+                        var username = context.User.Identity?.Name;
+                    }
+
+                    <div class="user-info">
+                        @if (!string.IsNullOrEmpty(avatarUrl))
+                        {
+                            <img src="@avatarUrl" alt="Avatar" class="user-avatar" style="width: 32px; height: 32px; border-radius: 50%;" />
+                        }
+                        else
+                        {
+                            <div class="avatar-placeholder" style="width: 32px; height: 32px; background: #444; border-radius: 50%; display: inline-block;"></div>
+                        }
+                        <span class="username" style="color: white; font-weight: 500; margin-left: 8px;">@username</span>
+                    </div>
+
+                    <form action="/local-logout" method="post" style="display:inline;">
+                        <AntiforgeryToken />
+                        <button type="submit" class="btn-logout">Logout</button>
+                    </form>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/signin" class="btn-signin">Sign in</a>
+                <a href="/register" class="btn-register">Register</a>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </header>
-
-
 @* 
     <div class="sidebar">
         <NavMenu />

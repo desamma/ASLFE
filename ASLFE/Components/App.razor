@@ -18,3 +18,17 @@
 </body>
 
 </html>
+//
+<script>
+        /*cookies can only be set on the browser by the browser. 
+    Any attempt to set them via a server-to-server call will silently do nothing from the user's perspective. */
+        window.localLogin = async (loginResponse) => {
+        const res = await fetch('/local-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(loginResponse),
+            credentials: 'include'
+        });
+        return res.ok;
+    };
+</script>
