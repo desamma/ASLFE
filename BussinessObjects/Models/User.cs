@@ -33,6 +33,19 @@ namespace BussinessObjects.Models
 
         public bool IsBanned { get; set; }
 
+        // --- CÁC TRƯỜNG BỔ SUNG THEO ERD ---
+
+        [Display(Name = "Currency Amount")]
+        public decimal CurrencyAmount { get; set; }
+
+        [Display(Name = "Pity Counter")]
+        public int PityCounter { get; set; }
+
+
         public ICollection<UserItem> UserItems { get; set; } = new List<UserItem>();
+
+        public ICollection<GachaHistory> GachaHistories { get; set; } = new List<GachaHistory>();
+
+        public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 }

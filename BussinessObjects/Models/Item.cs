@@ -8,23 +8,26 @@ namespace BussinessObjects.Models
 
         [MaxLength(50)]
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [MaxLength(500)]
         [Required]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         [MaxLength(50)]
         [Required]
-        public string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
 
         [MaxLength(50)]
         [Required]
-        public string Rarity { get; set; }
+        public string Rarity { get; set; } = string.Empty;
 
         [Required]
-        public string ImagePath { get; set; }
+        public string ImagePath { get; set; } = string.Empty;
+
 
         public ICollection<UserItem> UserItems { get; set; } = new List<UserItem>();
+
+        public ICollection<GachaItem> GachaItems { get; set; } = new List<GachaItem>();
     }
 }
