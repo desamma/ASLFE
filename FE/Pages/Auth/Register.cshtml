@@ -1,0 +1,42 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="signin-container">
+    <div class="signin-background">
+        <div class="signin-card">
+            <h1 class="signin-title">Create an account</h1>
+
+            <form method="post" class="signin-form">
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="validation-message">@Model.ErrorMessage</div>
+                }
+
+                <input asp-for="Input.Username" class="form-input" placeholder="Username" />
+                <span asp-validation-for="Input.Username" class="text-danger"></span>
+
+                <input asp-for="Input.Email" class="form-input" placeholder="Email" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+
+                <input asp-for="Input.Password" type="password" class="form-input" placeholder="Password" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+
+                <input asp-for="Input.ConfirmPassword" type="password" class="form-input" placeholder="Confirm Password" />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+
+                <button type="submit" class="btn-login">
+                    Register
+                </button>
+            </form>
+
+            <div class="signin-footer">
+                <a class="signin-link" href="/Auth/Login">Already have an account?</a>
+            </div>
+        </div>
+    </div>
+</div>
