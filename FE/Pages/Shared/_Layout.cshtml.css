@@ -8,7 +8,11 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(6px);
     color: #f5f5f5;
-    z-index: 10;
+    position: fixed;
+    top: 0;
+    left: 0; 
+    right: 0;
+    z-index: 9999;
 }
 
 /* inner container that holds logo, nav and actions */
@@ -266,11 +270,23 @@ main {
 }
 .nav-item.dropdown {
     position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.nav-item.dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 0.5rem;
+    z-index: 99;
 }
 
 .dropdown-menu {
     position: absolute;
-    top: 120%;
+    top: calc(100% - 0.5rem);
     left: 0;
     background: rgba(20, 20, 20, 0.95);
     border: 1px solid rgba(255,255,255,0.08);
@@ -280,6 +296,11 @@ main {
     display: none;
     flex-direction: column;
     z-index: 100;
+    padding-top: 0.7rem;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 9999;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
     .dropdown-menu a {
@@ -290,12 +311,20 @@ main {
         opacity: 0.85;
     }
 
-        .dropdown-menu a:hover {
-            background: rgba(255,255,255,0.08);
-            opacity: 1;
-        }
+    .dropdown-menu a:hover {
+        background: rgba(255,255,255,0.08);
+        opacity: 1;
+    }
+
+.dropdown-separator {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0.5rem 0;
+}
 
 /* SHOW DROPDOWN */
 .nav-item.dropdown:hover .dropdown-menu {
     display: flex;
+    opacity: 1;
+    visibility: visible;
 }

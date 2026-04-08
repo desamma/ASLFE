@@ -33,10 +33,31 @@
                         <a href="#">Modes</a>
                         <a href="#">Characters</a>
                         <a href="#">Ranking</a>
+                        @if (User.IsInRole("admin"))
+                        {
+                            <div class="dropdown-separator"></div>
+                            <a href="#">Manage Content</a>
+                            <a href="#">Analytics</a>
+                        }
                     </div>
                 </div>
-
-                <a href="/news" class="nav-item">News</a>
+                <div class="nav-item dropdown">
+                    <button class="nav-button">
+                        News
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="dropdown-icon">
+                            <path d="M7 10l5 5 5-5z" />
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="/News">All News</a>
+                        <a href="/News">Latest</a>
+                        @if (User.IsInRole("admin"))
+                        {
+                            <div class="dropdown-separator"></div>
+                            <a href="/News/CreateNews">Write Game News</a>
+                        }
+                    </div>
+                </div>
 
                 <div class="nav-item dropdown">
                     <button class="nav-button">

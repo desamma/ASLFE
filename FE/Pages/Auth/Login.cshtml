@@ -12,6 +12,11 @@
             <form method="post" class="signin-form">
                 <div asp-validation-summary="All" class="text-danger"></div>
 
+                @if (TempData["Success"] != null)
+                {
+                    <div class="validation-message" style="color: green; border-color: green;">@TempData["Success"]</div>
+                }
+
                 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
                 {
                     <div class="validation-message">@Model.ErrorMessage</div>

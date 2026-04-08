@@ -1,4 +1,6 @@
 ﻿using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace ASLFE.JWT
 {
@@ -11,24 +13,38 @@ namespace ASLFE.JWT
             _httpContextAccessor = httpContextAccessor;
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var requestPath = request.RequestUri?.AbsolutePath ?? string.Empty;
-            var isAuthEndpoint = requestPath.Contains("/api/auth/register", StringComparison.OrdinalIgnoreCase)||
+            var isAuthEndpoint = requestPath.Contains("/api/auth/register", StringComparison.OrdinalIgnoreCase) ||
                                 requestPath.Contains("/api/auth/login", StringComparison.OrdinalIgnoreCase);
 
-            if(isAuthEndpoint) return base.SendAsync(request, cancellationToken);
+            if (isAuthEndpoint)
+                return await base.SendAsync(request, cancellationToken);
 
             var httpCtx = _httpContextAccessor.HttpContext;
             var token = httpCtx?.Session.GetString("AccessToken");
-
 
             if (!string.IsNullOrWhiteSpace(token) && !isAuthEndpoint)
             {
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
 
-            return base.SendAsync(request, cancellationToken);
+            // Send the request
+            var response = await base.SendAsync(request, cancellationToken);
+
+            // Check if we got a 401 Unauthorized response (token expired)
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized && httpCtx != null)
+            {
+                // Clear the expired token from session
+                httpCtx.Session.Remove("AccessToken");
+                httpCtx.Session.Clear();
+
+                // Sign out the user to clear authentication cookies
+                await httpCtx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+
+            return response;
         }
     }
 }

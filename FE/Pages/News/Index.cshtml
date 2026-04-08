@@ -1,0 +1,117 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Game News";
+}
+
+<div class="news-list-container">
+    <div class="news-list-header">
+        <div class="news-list-header-content">
+            <h1 class="news-list-title">Game News</h1>
+            <p class="news-list-subtitle">Stay updated with the latest news and announcements</p>
+        </div>
+    </div>
+
+    <div class="news-list-content">
+        <!-- Search Bar -->
+        <div class="search-section">
+            <form method="get" class="search-form">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" name="searchTerm" class="search-input" placeholder="Search news..." value="@Model.SearchTerm" />
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                    {
+                        <a href="/News" class="search-clear">✕</a>
+                    }
+                </div>
+            </form>
+        </div>
+
+        <!-- Error Message -->
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-error">
+                <svg class="alert-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="10" />
+                    <text x="12" y="16" text-anchor="middle" font-size="20" fill="white">!</text>
+                </svg>
+                @Model.ErrorMessage
+            </div>
+        }
+
+        <!-- News List -->
+        @if (Model.NewsList.Count > 0)
+        {
+            <div class="news-grid">
+                @foreach (var news in Model.NewsList)
+                {
+                    <a href="/News/ReadNews/@news.Id" class="news-item">
+                        @if (!string.IsNullOrEmpty(news.BannerPath))
+                        {
+                            <div class="news-item-image">
+                                <img src="/images/@news.BannerPath" alt="@news.Title" />
+                                <div class="news-item-overlay"></div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="news-item-image news-item-image-placeholder">
+                                <div class="placeholder-icon">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <rect x="2" y="2" width="20" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                                        <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                                        <path d="M2 16l6-6 8 8 8-8" stroke="currentColor" stroke-width="2" fill="none"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        }
+                        
+                        <div class="news-item-content">
+                            <h3 class="news-item-title">@news.Title</h3>
+                            <p class="news-item-description">@news.Description</p>
+                            <div class="news-item-footer">
+                                <span class="news-item-read-more">Read More →</span>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12h18"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M3 18h18"></path>
+                    <circle cx="6" cy="12" r="1" fill="currentColor"></circle>
+                    <circle cx="6" cy="6" r="1" fill="currentColor"></circle>
+                    <circle cx="6" cy="18" r="1" fill="currentColor"></circle>
+                </svg>
+                <h3 class="empty-state-title">
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                    {
+                        <text>No news found</text>
+                    }
+                    else
+                    {
+                        <text>No news available</text>
+                    }
+                </h3>
+                <p class="empty-state-text">
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                    {
+                        <text>Try adjusting your search terms</text>
+                    }
+                    else
+                    {
+                        <text>Check back later for updates</text>
+                    }
+                </p>
+            </div>
+        }
+    </div>
+</div>
