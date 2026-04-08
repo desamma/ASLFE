@@ -1,0 +1,54 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+.btn-signin,
+.btn-signin:link,
+.btn-signin:visited {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #fff !important;
+    background: none;
+    text-decoration: none !important;
+}
+
+    .btn-signin:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+.btn-register,
+.btn-register:link,
+.btn-register:visited {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border-radius: 4px;
+    background: #fff;
+    color: #111 !important;
+    font-weight: 600;
+    text-decoration: none !important;
+}
+
+    .btn-register:hover {
+        background: #9e9e9e;
+        color: #fff !important;
+    }
