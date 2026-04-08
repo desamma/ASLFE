@@ -49,13 +49,12 @@
                         </svg>
                     </button>
                     <div class="dropdown-menu">
-                        <a href="#">Latest</a>
-                        <a href="#">Events</a>
-                        <a href="#">Announcements</a>
+                        <a href="/News">All News</a>
+                        <a href="/News">Latest</a>
                         @if (User.IsInRole("admin"))
                         {
                             <div class="dropdown-separator"></div>
-                            <a href="news/createnews">Write Game News</a>
+                            <a href="/News/CreateNews">Write Game News</a>
                         }
                     </div>
                 </div>

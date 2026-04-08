@@ -1,11 +1,13 @@
+using BussinessObjects.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
-using System.Net.Http.Json;
-using BussinessObjects.Models;
+using System.Text.Json;
 
 namespace FE.Pages.News
 {
+    [Authorize(Roles = "admin")]
     public class CreateNewsModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -22,9 +24,48 @@ namespace FE.Pages.News
 
         public string ErrorMessage { get; set; } = string.Empty;
         public string SuccessMessage { get; set; } = string.Empty;
+        public Guid? EditingNewsId { get; set; }
+        public bool IsEditing { get; set; }
 
-        public void OnGet()
+        public async Task OnGetAsync(Guid? id)
         {
+            if (id.HasValue)
+            {
+                IsEditing = true;
+                EditingNewsId = id;
+
+                try
+                {
+                    var client = _httpClientFactory.CreateClient("Api");
+                    var response = await client.GetAsync($"api/gamenews/{id}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                        var content = await response.Content.ReadAsStringAsync();
+
+                        var jsonElement = JsonSerializer.Deserialize<JsonElement>(content, jsonOptions);
+                        if (jsonElement.ValueKind == JsonValueKind.Object && jsonElement.TryGetProperty("data", out var dataProperty))
+                        {
+                            var news = JsonSerializer.Deserialize<GameNews>(dataProperty.GetRawText(), jsonOptions);
+                            if (news != null)
+                            {
+                                Input = new InputModel
+                                {
+                                    Title = news.Title,
+                                    BannerPath = news.BannerPath,
+                                    Description = news.Description,
+                                    Content = news.Content
+                                };
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = $"Failed to load news for editing: {ex.Message}";
+                }
+            }
         }
 
         public IActionResult OnGetImages()
@@ -32,7 +73,7 @@ namespace FE.Pages.News
             try
             {
                 var imagesPath = Path.Combine(_webHostEnvironment.WebRootPath, "images");
-                
+
                 if (!Directory.Exists(imagesPath))
                 {
                     return new JsonResult(new { success = false, images = new List<object>() });
@@ -58,33 +99,61 @@ namespace FE.Pages.News
             }
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(Guid? id)
         {
             if (!ModelState.IsValid)
                 return Page();
 
             try
             {
-                var gameNews = new GameNews
-                {
-                    Id = Guid.NewGuid(),
-                    Title = Input.Title,
-                    BannerPath = Input.BannerPath ?? string.Empty,
-                    Description = Input.Description,
-                    Content = Input.Content
-                };
-
                 var client = _httpClientFactory.CreateClient("Api");
-                var response = await client.PostAsJsonAsync("api/gamenews", gameNews);
 
-                if (response.IsSuccessStatusCode)
+                if (id.HasValue)
                 {
-                    SuccessMessage = "News created successfully!";
-                    Input = new InputModel();
-                    return Page();
+                    // Edit existing news
+                    var gameNews = new GameNews
+                    {
+                        Id = id.Value,
+                        Title = Input.Title,
+                        BannerPath = Input.BannerPath ?? string.Empty,
+                        Description = Input.Description,
+                        Content = Input.Content
+                    };
+
+                    var response = await client.PutAsJsonAsync($"api/gamenews/{id}", gameNews);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        SuccessMessage = "News updated successfully!";
+                        return RedirectToPage("/News/ReadNews", new { id = id });
+                    }
+
+                    ErrorMessage = "Failed to update news. Please try again.";
+                }
+                else
+                {
+                    // Create new news
+                    var gameNews = new GameNews
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = Input.Title,
+                        BannerPath = Input.BannerPath ?? string.Empty,
+                        Description = Input.Description,
+                        Content = Input.Content
+                    };
+
+                    var response = await client.PostAsJsonAsync("api/gamenews", gameNews);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        SuccessMessage = "News created successfully!";
+                        Input = new InputModel();
+                        return Page();
+                    }
+
+                    ErrorMessage = "Failed to create news. Please try again.";
                 }
 
-                ErrorMessage = "Failed to create news. Please try again.";
                 return Page();
             }
             catch (Exception ex)

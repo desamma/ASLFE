@@ -1,25 +1,15 @@
 @page
 @model CreateNewsModel
 @{
-    ViewData["Title"] = "Create Game News";
+    ViewData["Title"] = Model.IsEditing ? "Edit Game News" : "Create Game News";
 }
 
 <div class="news-create-container">
     <div class="news-create-card">
-        <h1 class="news-title">Create Game News</h1>
+        <h1 class="news-title">@(Model.IsEditing ? "Edit Game News" : "Create Game News")</h1>
 
         <form method="post" enctype="multipart/form-data" class="news-form">
             <div asp-validation-summary="All" class="text-danger"></div>
-
-            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-            {
-                <div class="alert alert-danger">@Model.ErrorMessage</div>
-            }
-
-            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
-            {
-                <div class="alert alert-success">@Model.SuccessMessage</div>
-            }
 
             <!-- Title Input -->
             <div class="form-group">
@@ -81,7 +71,11 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="btn-submit">Create News</button>
+            <button type="submit" class="btn-submit">@(Model.IsEditing ? "Update News" : "Create News")</button>
+            @if (Model.IsEditing && Model.EditingNewsId.HasValue)
+            {
+                <a href="/News/ReadNews/@Model.EditingNewsId" class="btn-cancel">Cancel</a>
+            }
         </form>
     </div>
 </div>
@@ -125,9 +119,72 @@
     </div>
 </div>
 
+<!-- Notification Modal -->
+<div id="notificationModal" class="modal-overlay" style="display: none;" onclick="closeNotificationModal(event)">
+    <div class="modal-content modal-notification" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2 id="notificationTitle">Notification</h2>
+            <button type="button" class="modal-close" onclick="closeNotificationModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="notificationContent" class="notification-content"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-primary" id="notificationBtn" onclick="handleNotificationAction()">OK</button>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/js/news-editor.js"></script>
     <script>
+        let notificationAction = null;
+
+        function showNotification(title, message, type, actionCallback = null) {
+            const modal = document.getElementById('notificationModal');
+            const titleElem = document.getElementById('notificationTitle');
+            const contentElem = document.getElementById('notificationContent');
+            const btnElem = document.getElementById('notificationBtn');
+            
+            titleElem.textContent = title;
+            contentElem.innerHTML = `<div class="notification-${type}">${escapeHtml(message)}</div>`;
+            
+            // Add type-specific styling
+            if (type === 'success') {
+                btnElem.className = 'btn-primary btn-success';
+            } else if (type === 'error') {
+                btnElem.className = 'btn-primary btn-danger';
+            } else {
+                btnElem.className = 'btn-primary';
+            }
+            
+            notificationAction = actionCallback;
+            modal.style.display = 'flex';
+            btnElem.focus();
+        }
+
+        function closeNotificationModal(event) {
+            if (event && event.target.id !== 'notificationModal') return;
+            document.getElementById('notificationModal').style.display = 'none';
+            notificationAction = null;
+        }
+
+        function handleNotificationAction() {
+            closeNotificationModal();
+            if (notificationAction && typeof notificationAction === 'function') {
+                notificationAction();
+            }
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const descriptionInput = document.querySelector('[asp-for="Input.Description"]');
             const contentEditor = document.getElementById('ContentEditor');
@@ -156,6 +213,38 @@
                 document.getElementById('contentCount').textContent = contentEditor.value.length;
                 updatePreview();
             }
+
+            // Show notification if there's a success or error message
+            const errorMessage = `@Model.ErrorMessage`;
+            const successMessage = `@Model.SuccessMessage`;
+
+            if (errorMessage && errorMessage.trim()) {
+                showNotification('Error', errorMessage, 'error');
+            } else if (successMessage && successMessage.trim()) {
+                showNotification(
+                    'Success',
+                    successMessage,
+                    'success',
+                    function() {
+                        @if (Model.IsEditing && Model.EditingNewsId.HasValue)
+                        {
+                            <text>
+                            window.location.href = '/News/ReadNews/@Model.EditingNewsId';
+                            </text>
+                        }
+                    }
+                );
+            }
+
+            // Allow closing notification modal with Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    const notificationModal = document.getElementById('notificationModal');
+                    if (notificationModal && notificationModal.style.display !== 'none') {
+                        closeNotificationModal();
+                    }
+                }
+            });
         });
     </script>
 }
