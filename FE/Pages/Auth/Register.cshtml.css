@@ -7,6 +7,7 @@
     /* Combine the gradient with the full-viewport background image so it spans the entire container */
     background: linear-gradient(135deg, rgba(10,10,10,0.55) 0%, rgba(26,26,26,0.65) 100%), url('/images/mhbackground.jpg') center/cover no-repeat;
     padding: 40px 20px;
+    margin-top: 4rem;
 }
 
 .signin-background {

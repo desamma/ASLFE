@@ -58,7 +58,8 @@ public class LoginModel : PageModel
                 new(ClaimTypes.Name, loginResponse.Username),
                 new(ClaimTypes.Email, loginResponse.Email ?? ""),
                 new("Avatar", loginResponse.Avatar ?? ""),
-                new("Gender", loginResponse.Gender.ToString())
+                new("Gender", loginResponse.Gender.ToString()),
+                new("CurrencyAmount", loginResponse.CurrencyAmount.ToString("F2"))
             };
 
             if (loginResponse.Roles != null)
@@ -106,6 +107,7 @@ public class LoginModel : PageModel
         public string? Email { get; set; }
         public string? Avatar { get; set; }
         public byte Gender { get; set; }
+        public decimal CurrencyAmount { get; set; }
         public List<string>? Roles { get; set; }
     }
 }

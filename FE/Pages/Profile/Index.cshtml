@@ -1,0 +1,163 @@
+@page
+@model FE.Pages.Profile.IndexModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="profile-container">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="profile-error">
+            <div class="error-content">
+                <h2>Error Loading Profile</h2>
+                <p>@Model.ErrorMessage</p>
+                <a href="/" class="btn-back">Back to Home</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Profile Header with Avatar and Currency -->
+        <div class="profile-header-section">
+            <div class="avatar-currency-wrapper">
+                <!-- Avatar -->
+                <div class="avatar-container">
+                    @if (!string.IsNullOrEmpty(Model.UserProfile.UserAvatar))
+                    {
+                        <img src="@Model.UserProfile.UserAvatar" alt="Avatar" class="profile-avatar" />
+                    }
+                    else
+                    {
+                        <div class="profile-avatar-placeholder"></div>
+                    }
+                </div>
+
+                <!-- Currency Badge -->
+                <div class="currency-badge">
+                    <div class="currency-icon">
+                        <img src="/images/virtual-currency.png" alt="Currency Icon" class="currency-image" />
+                    </div>
+                    <div class="currency-content">
+                        <span class="currency-label">Premium Currency</span>
+                        <span class="currency-amount">@Model.UserProfile.CurrencyAmount.ToString("F2")</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div class="alerts-section">
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        @Model.ErrorMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @Model.SuccessMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Profile Form -->
+        <div class="profile-content">
+            <h1 class="profile-title">@Model.UserProfile.UserName</h1>
+
+            <form method="post" class="profile-form" enctype="multipart/form-data">
+                <input type="hidden" asp-for="IsEditing" />
+
+                <!-- Avatar Upload Section (only show in edit mode) -->
+                @if (Model.IsEditing)
+                {
+                    <div class="avatar-upload-section">
+                        <h2 class="section-title">Update Avatar</h2>
+                        <div class="avatar-upload-wrapper">
+                            <label class="avatar-upload-input">
+                                <input type="file" asp-for="AvatarFile" accept="image/*" class="file-input-hidden" />
+                                <div class="avatar-upload-box">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="upload-icon">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    <p class="upload-text">Click to select an image<br><small>or drag and drop</small></p>
+                                    <small class="upload-hint">Max 5MB • JPG, PNG, GIF, WebP</small>
+                                </div>
+                            </label>
+                            <div id="uploadPreview" class="upload-preview" style="display: none;">
+                                <img id="previewImage" alt="Preview" />
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Profile Fields Grid -->
+                <div class="form-section">
+                    <h2 class="section-title">Account Information</h2>
+
+                    <!-- Username -->
+                    <div class="form-group">
+                        <label asp-for="UserProfile.UserName" class="form-label">Username</label>
+                        <input asp-for="UserProfile.UserName" class="form-control" disabled="@(Model.IsEditing ? (string?)null : "disabled")" />
+                        <span asp-validation-for="UserProfile.UserName" class="text-danger"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label asp-for="UserProfile.Email" class="form-label">Email Address</label>
+                        <input asp-for="UserProfile.Email" class="form-control" type="email" disabled="@(Model.IsEditing ? (string?)null : "disabled")" />
+                        <span asp-validation-for="UserProfile.Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="form-group">
+                        <label asp-for="UserProfile.PhoneNumber" class="form-label">Phone Number</label>
+                        <input asp-for="UserProfile.PhoneNumber" class="form-control" type="tel" placeholder="Enter phone number (digits only, max 11)" disabled="@(Model.IsEditing ? (string?)null : "disabled")" />
+                        <span asp-validation-for="UserProfile.PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div class="form-group">
+                        <label asp-for="UserProfile.UserDOB" class="form-label">Date of Birth</label>
+                        <input asp-for="UserProfile.UserDOB" class="form-control" type="date" disabled="@(Model.IsEditing ? (string?)null : "disabled")" />
+                        <span asp-validation-for="UserProfile.UserDOB" class="text-danger"></span>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="form-group">
+                        <label asp-for="UserProfile.Gender" class="form-label">Gender</label>
+                        <select asp-for="UserProfile.Gender" class="form-select" disabled="@(Model.IsEditing ? (string?)null : "disabled")">
+                            <option value="0">Male</option>
+                            <option value="1">Female</option>
+                            <option value="2">Other</option>
+                        </select>
+                        <span asp-validation-for="UserProfile.Gender" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="button-section">
+                    <a href="/" class="btn btn-secondary">Cancel</a>
+                    @if (!Model.IsEditing)
+                    {
+                        <a asp-page="./Index" asp-route-edit="true" class="btn btn-primary">Enable Editing</a>
+                    }
+                    else
+                    {
+                        <a asp-page="./Index" class="btn btn-secondary">Stop Editing</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    }
+                </div>
+            </form>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/FE/Pages/Profile/Index.cshtml.js"></script>
+}
