@@ -1,0 +1,175 @@
+﻿@page
+@model ShopIndexModel
+@{
+    ViewData["Title"] = "Web Store";
+}
+
+<div class="shop-container">
+    <!-- Shop Header -->
+    <section class="shop-header">
+        <div class="shop-header-content">
+            <h1 class="shop-title">Web Store</h1>
+            <p class="shop-subtitle">Discover exclusive offers and get the best deals on Gems!</p>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Category Tabs -->
+    <section class="shop-categories-header">
+        <div class="categories-container">
+            @{
+                var categories = Model.ShopItemsByCategory.Keys.ToList();
+                var categoryOrder = new Dictionary<string, int>
+                {
+                    { "Currency", 0 },
+                    { "Item", 1 },
+                    { "Bundle", 2 }
+                };
+
+                var orderedCategories = categories.OrderBy(c => categoryOrder.ContainsKey(c) ? categoryOrder[c] : 99).ToList();
+            }
+
+            @foreach (var category in orderedCategories)
+            {
+                var isFirst = orderedCategories.First() == category;
+                var categoryKey = category.Trim().ToLowerInvariant().Replace(" ", "-");
+                var cssClass = $"category-tab {(isFirst ? "active" : "")}";
+
+                <button class="@cssClass" data-category="@categoryKey" type="button">
+                    <span class="tab-icon">
+                        @if (category == "Currency")
+                        {
+                            <img src="/images/virtual-currency.png" width="32" height="32" alt="currency" />
+                        }
+                        else if (category == "Item")
+                        {
+                            <span>⚔️</span>
+                        }
+                        else if (category == "Bundle")
+                        {
+                            <span>📦</span>
+                        }
+                        else
+                        {
+                            <span>📌</span>
+                        }
+                    </span>
+                    @category
+                </button>
+            }
+        </div>
+    </section>
+
+    <!-- Shop Items Grid -->
+    <section class="shop-items-section">
+        @{
+            var itemsByCategory = Model.ShopItemsByCategory.Keys.ToList();
+            var catOrder = new Dictionary<string, int>
+            {
+                { "Currency", 0 },
+                { "Item", 1 },
+                { "Bundle", 2 }
+            };
+        }
+
+        @foreach (var category in itemsByCategory.OrderBy(c => catOrder.ContainsKey(c) ? catOrder[c] : 99))
+        {
+            var items = Model.ShopItemsByCategory[category];
+            var isFirst = itemsByCategory.OrderBy(c => catOrder.ContainsKey(c) ? catOrder[c] : 99).First() == category;
+            var categoryKey = category.Trim().ToLowerInvariant().Replace(" ", "-");
+
+            <div class="shop-category @(isFirst ? "active" : "")" id="@categoryKey">
+                <h2 class="category-heading">
+                    <span class="heading-icon">
+                        @if (category == "Currency")
+                        {
+                            <img src="/images/virtual-currency.png" width="32" height="32" alt="currency" />
+                        }
+                        else if (category == "Item")
+                        {
+                            <span>⚔️</span>
+                        }
+                        else if (category == "Bundle")
+                        {
+                            <svg fill="#ffffff" width="36" height="36" viewBox="0 0 36 36" version="1.1" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" stroke="#ffffff" stroke-width="0.00036"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>bundle-line</title> <path class="clr-i-outline clr-i-outline-path-1" d="M32.43,8.35l-13-6.21a1,1,0,0,0-.87,0l-15,7.24a1,1,0,0,0-.57.9V26.83a1,1,0,0,0,.6.92l13,6.19a1,1,0,0,0,.87,0l15-7.24a1,1,0,0,0,.57-.9V9.25A1,1,0,0,0,32.43,8.35ZM19,4.15,29.93,9.37l-5.05,2.44L14.21,6.46ZM17,15.64,6,10.41l5.9-2.85L22.6,12.91ZM5,12.13,16,17.4V31.46L5,26.2ZM18,31.45V17.36l13-6.29v14.1Z"></path> <rect x="0" y="0" width="36" height="36" fill-opacity="0"></rect> </g></svg>
+                        }
+                        else
+                        {
+                            <span>📌</span>
+                        }
+                    </span> @category
+                </h2>
+                <div class="items-grid">
+                    @foreach (var item in items)
+                    {
+                        <div class="shop-item-card">
+                            <div class="item-image-wrapper">
+                                <img src="@item.ImagePath" alt="@item.Name" class="item-image" />
+                                @if (item.IsFeatured)
+                                {
+                                    <span class="featured-badge">Featured</span>
+                                }
+                                @if (!string.IsNullOrEmpty(item.Description))
+                                {
+                                    <span class="item-label">@item.Description</span>
+                                }
+                            </div>
+                            <div class="item-details">
+                                <h3 class="item-name">@item.Name</h3>
+                                @if (item.ItemType != null)
+                                {
+                                    <p class="item-type">@item.ItemType</p>
+                                }
+                                @if (item.CurrencyAmount.HasValue && item.CurrencyAmount > 0)
+                                {
+                                    <p class="item-reward">
+                                        <span class="reward-icon">+</span> @item.CurrencyAmount.Value.ToString("N0")
+                                        <img src="/images/virtual-currency.png" width="24" height="24" alt="gem" />
+                                    </p>
+                                }
+                                @if (item.ItemQuantity.HasValue && item.ItemQuantity > 1)
+                                {
+                                    <p class="item-quantity">Quantity: @item.ItemQuantity</p>
+                                }
+                            </div>
+                            <div class="item-footer">
+                                <div class="price-section">
+                                    @if (item.Price.HasValue)
+                                    {
+                                        <span class="price @(item.IsUsingPremiumCurrency ? "premium-currency" : "regular-currency")">
+                                            @if (item.IsUsingPremiumCurrency)
+                                            {
+                                                <img src="/images/virtual-currency.png" width="20" height="20" alt="gem" />
+                                            }
+                                            else
+                                            {
+                                                <span>VND</span>
+                                            }
+                                            @item.Price.Value.ToString("N2")
+                                        </span>
+                                    }
+                                </div>
+                                <a href="/Shop/Detail/@item.Id" class="btn-purchase @(item.IsUsingPremiumCurrency ? "" : "btn-purchase-primary")" type="button">
+                                    <span>@(item.IsUsingPremiumCurrency ? "View Details" : "View Details")</span>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/shop-index.js"></script>
+}
+
+
