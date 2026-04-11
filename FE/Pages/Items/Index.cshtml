@@ -1,0 +1,105 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Items Database";
+}
+
+<div class="items-container">
+    <!-- Page Header -->
+    <section class="items-header">
+        <div class="header-content">
+            <h1 class="items-title">Item Database</h1>
+            <p class="items-subtitle">Explore all available items, equipment, armor, and weapons</p>
+        </div>
+        <div class="header-back">
+            <a href="/" class="back-link">? Back to Home</a>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    else if (Model.Items.Any())
+    {
+        <!-- Filter Section -->
+        <section class="filter-section">
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="typeFilter" class="filter-label">Item Type:</label>
+                    <select id="typeFilter" class="filter-select">
+                        <option style="color : black;" value="">All Types</option>
+                        @foreach (var type in Model.AvailableTypes)
+                        {
+                            <option style="color : black;" value="@type">@type</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="rarityFilter" class="filter-label">Rarity:</label>
+                    <select id="rarityFilter" class="filter-select">
+                        <option style="color : black;" value="">All Rarities</option>
+                        @foreach (var rarity in Model.AvailableRarities)
+                        {
+                            <option style="color : black;" value="@rarity">@rarity</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="searchInput" class="filter-label">Search:</label>
+                    <input type="text" id="searchInput" class="filter-input" placeholder="Search by name or description..." />
+                </div>
+
+                <button id="resetFilters" class="btn-reset-filters">Reset Filters</button>
+            </div>
+            
+            <div class="filter-info">
+                <span id="itemCount" class="item-count">Showing <strong>@Model.Items.Count</strong> items</span>
+            </div>
+        </section>
+
+        <!-- Items Grid -->
+        <section class="items-content">
+            <div class="items-grid" id="itemsGrid">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="item-card" data-type="@item.Type" data-rarity="@item.Rarity" data-name="@item.Name" data-description="@item.Description" data-id="@item.Id">
+                        <div class="item-image-wrapper">
+                            <img src="@item.ImagePath" alt="@item.Name" class="item-image" />
+                            <span class="rarity-badge rarity-@item.Rarity.ToLower().Replace(" ", "-")">
+                                @item.Rarity
+                            </span>
+                        </div>
+                        <div class="item-info">
+                            <h3 class="item-name">@item.Name</h3>
+                            <p class="item-type">@item.Type</p>
+                            <p class="item-description">@item.Description</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="no-results" style="display: none;">
+            <div class="no-results-content">
+                <svg class="no-results-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <h2>No items found</h2>
+                <p>Try adjusting your filters or search terms</p>
+                <button id="clearFiltersBtn" class="btn-clear-filters">Clear All Filters</button>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/items-filter.js"></script>
+}
