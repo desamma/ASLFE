@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FE.styles.css" asp-append-version="true" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <header class="game-header">
@@ -64,6 +66,15 @@
                         Shop
                     </a>
                 </div>
+
+                <div class="nav-item dropdown">
+                    <a class="nav-button" style="text-decoration: none; display: flex; align-items: center; gap: 8px;" href="/Payment">
+                        <svg viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px;">
+                            <path d="M20 8H4V6h16m0 12H4v2h16m0-6H4v2h16z" />
+                        </svg>
+                        Purchase
+                    </a>
+                </div>
             </nav>
 
             @if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -73,10 +84,12 @@
                 var currencyAmount = User.FindFirst("CurrencyAmount")?.Value ?? "0";
 
                 <div class="user-profile-group" style="display: flex; align-items: center; gap: 12px;">
-                    <!-- Currency Badge -->
-                    <div class="currency-badge-header" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255, 215, 0, 0.1); border-radius: 6px; border: 1px solid rgba(255, 215, 0, 0.3);">
-                        <img src="/images/virtual-currency.png" alt="Currency" style="width: 24px; height: 24px;" />
-                        <span style="color: #ffd700; font-weight: 600; font-size: 14px;">@currencyAmount</span>
+                    <!-- Currency Badge — số VP được cập nhật live từ API -->
+                    <div class="currency-badge-header" style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(255,215,0,0.1); border-radius: 6px; border: 1px solid rgba(255,215,0,0.3);">
+                        <img src="/images/virtual-currency.png" alt="VP"
+                             style="width: 24px; height: 24px; object-fit: contain;" />
+                        <span id="vp-balance-display"
+                              style="color: #ffd700; font-weight: 600; font-size: 14px;">@currencyAmount</span>
                     </div>
 
                     <a href="/Profile" class="user-info-link" style="text-decoration: none; display: flex; align-items: center; cursor: pointer;">
@@ -92,9 +105,7 @@
                                      style="width: 32px; height: 32px; background: #444; border-radius: 50%; display: inline-block;">
                                 </div>
                             }
-
-                            <span class="username"
-                                  style="color: white; font-weight: 500; margin-left: 8px;">
+                            <span class="username" style="color: white; font-weight: 500; margin-left: 8px;">
                                 @username
                             </span>
                         </div>
@@ -116,13 +127,34 @@
         </div>
     </header>
 
-        <main>
-            @RenderBody()
-        </main>
+    <main style="padding-top: 64px;">
+        @RenderBody()
+    </main>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <script>
+            // Fetch real VP balance from DB on every page load
+            (async function () {
+                try {
+                    const res = await fetch('/payment-proxy?path=balance', { credentials: 'include' });
+                    if (!res.ok) return;
+                    const json = await res.json();
+                    const balance = json.balance ?? json.data?.balance;
+                    if (balance !== undefined) {
+                        const el = document.getElementById('vp-balance-display');
+                        if (el) el.textContent = new Intl.NumberFormat('en-US').format(balance);
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch VP balance:', e);
+                }
+            })();
+        </script>
+    }
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

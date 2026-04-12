@@ -38,7 +38,24 @@ builder.Services.AddHttpClient("Api", client =>
 .AddHttpMessageHandler<JwtSessionHandler>();
 
 var app = builder.Build();
+app.MapGet("/payment-proxy", async (string path, HttpContext ctx, IHttpClientFactory factory) =>
+{
+    var client = factory.CreateClient("Api");
+    var response = await client.GetAsync($"api/payment/{path}");
+    var content = await response.Content.ReadAsStringAsync();
+    return Results.Content(content, "application/json");
+});
 
+app.MapPost("/payment-proxy", async (string path, HttpContext ctx, IHttpClientFactory factory) =>
+{
+    var client = factory.CreateClient("Api");
+    using var reader = new StreamReader(ctx.Request.Body);
+    var body = await reader.ReadToEndAsync();
+    var httpContent = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+    var response = await client.PostAsync($"api/payment/{path}", httpContent);
+    var content = await response.Content.ReadAsStringAsync();
+    return Results.Content(content, "application/json");
+});
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
