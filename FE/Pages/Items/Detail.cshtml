@@ -12,14 +12,14 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <div class="back-link-section">
-            <a href="/Items" class="back-link">← Back to Items</a>
+            <a href="/Items" class="back-link">Back to Items</a>
         </div>
     }
     else if (Model.Item != null)
     {
         <!-- Back Link -->
         <div class="back-link-section">
-            <a href="/Items" class="back-link">← Back to Items</a>
+            <a href="/Items" class="back-link">Back to Items</a>
         </div>
 
         <!-- Detail Header -->
@@ -72,6 +72,23 @@
                         <h3 class="info-title">Description</h3>
                         <p class="info-description">@Model.Item.Description</p>
                     </div>
+
+                    <!-- Item Stats -->
+                    @if (Model.Item.StatsLines != null && Model.Item.StatsLines.Any())
+                    {
+                        <div class="info-group">
+                            <h3 class="info-title">Stats</h3>
+                            <div class="stats-list">
+                                @foreach (var stat in Model.Item.StatsLines)
+                                {
+                                    <div class="stat-item">
+                                        <span class="stat-icon">⬥</span>
+                                        <span class="stat-text">@stat</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </section>

@@ -10,7 +10,7 @@ namespace BussinessObjects.Models
         [Required]
         public string Title { get; set; }
 
-        public string BannerPath { get; set; } = null;
+        public string? BannerPath { get; set; } = null;
 
         [MaxLength(500)]
         [Required]
