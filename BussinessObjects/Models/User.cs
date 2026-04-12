@@ -8,7 +8,7 @@ namespace BussinessObjects.Models
     {
         [MaxLength(50)]
         [Required]
-        public override string UserName { get; set; }
+        public override string? UserName { get; set; }
 
         [DataType(DataType.Date)]
         [Display(Name = "Date of Birth")]
@@ -27,6 +27,9 @@ namespace BussinessObjects.Models
         [ValidateNever]
         public string? UserAvatar { get; set; }
 
+        [ValidateNever]
+        public string? SaveFilePath { get; set; }
+
         [DataType(DataType.DateTime)]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime? CreatedDate { get; set; } = DateTime.Now;
@@ -36,7 +39,7 @@ namespace BussinessObjects.Models
         // --- CÁC TRƯỜNG BỔ SUNG THEO ERD ---
 
         [Display(Name = "Currency Amount")]
-        public decimal CurrencyAmount { get; set; }
+        public int CurrencyAmount { get; set; }
 
         [Display(Name = "Pity Counter")]
         public int PityCounter { get; set; }

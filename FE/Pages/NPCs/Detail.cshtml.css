@@ -22,7 +22,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #ff6b35;
+    color: #4a90e2;
     text-decoration: none;
     font-weight: 600;
     font-size: 1rem;
@@ -31,19 +31,19 @@
 
 .back-link:hover {
     gap: 12px;
-    color: #ff7e4f;
-    text-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+    color: #6ab0ff;
+    text-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
 }
 
 /* Detail Header */
 .detail-header {
-    background: linear-gradient(135deg, #1a0a00 0%, #4a1a00 50%, #2a0a00 100%);
+    background: linear-gradient(135deg, #0a0a3a 0%, #1a1a5a 50%, #0a0a2a 100%);
     background-image: url('/images/shop-header-bg.jpg');
     background-size: cover;
     background-position: center;
     background-blend-mode: overlay;
     padding: 40px 50px;
-    border-bottom: 2px solid #ff6b35;
+    border-bottom: 2px solid #4a90e2;
 }
 
 .detail-header-content {
@@ -60,13 +60,13 @@
 }
 
 .breadcrumb-item a {
-    color: #ff6b35;
+    color: #4a90e2;
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
 .breadcrumb-item a:hover {
-    color: #ff7e4f;
+    color: #6ab0ff;
     text-decoration: underline;
 }
 
@@ -87,8 +87,8 @@
     font-size: 3rem;
     font-weight: 800;
     margin: 0;
-    color: #ff6b35;
-    text-shadow: 0 2px 10px rgba(255, 107, 53, 0.5);
+    color: #4a90e2;
+    text-shadow: 0 2px 10px rgba(74, 144, 226, 0.5);
     letter-spacing: 1px;
 }
 
@@ -119,8 +119,8 @@
     position: relative;
     overflow: hidden;
     border-radius: 15px;
-    border: 2px solid rgba(255, 107, 53, 0.3);
-    background: linear-gradient(135deg, #2a1a0a 0%, #1a0a0a 100%);
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    background: linear-gradient(135deg, #0a1a3a 0%, #0a0a1a 100%);
     padding: 40px;
     display: flex;
     align-items: center;
@@ -140,7 +140,7 @@
     transform: scale(1.05);
 }
 
-.rarity-badge-large {
+.type-badge-large {
     position: absolute;
     top: 20px;
     right: 20px;
@@ -153,37 +153,29 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
 }
 
-/* Rarity Badge Colors */
-.rarity-common {
-    background: #888888;
-    color: #ffffff;
-}
-
-.rarity-uncommon {
-    background: #4ade80;
-    color: #000000;
-}
-
-.rarity-rare {
-    background: #3b82f6;
-    color: #ffffff;
-}
-
-.rarity-epic {
-    background: #a855f7;
-    color: #ffffff;
-}
-
-.rarity-legendary {
-    background: linear-gradient(135deg, #ff6b35 0%, #d4521a 100%);
-    color: #ffffff;
-    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.6);
-}
-
-.rarity-mythic {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+/* Type Badge Colors */
+.type-merchant {
+    background: #fbbf24;
     color: #000000;
     box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6);
+}
+
+.type-questgiver {
+    background: #34d399;
+    color: #000000;
+    box-shadow: 0 6px 20px rgba(52, 211, 153, 0.6);
+}
+
+.type-dialogonly {
+    background: #60a5fa;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(96, 165, 250, 0.6);
+}
+
+.type-companion {
+    background: #c084fc;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(192, 132, 252, 0.6);
 }
 
 /* Detail Info Section */
@@ -198,7 +190,7 @@
     flex-direction: column;
     gap: 12px;
     padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 107, 53, 0.2);
+    border-bottom: 1px solid rgba(74, 144, 226, 0.2);
 }
 
 .info-group:last-child {
@@ -209,7 +201,7 @@
 .info-title {
     font-size: 1.2rem;
     font-weight: 700;
-    color: #ff6b35;
+    color: #4a90e2;
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -227,51 +219,6 @@
     color: #cccccc;
     margin: 0;
     line-height: 1.6;
-}
-
-.rarity-display {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.rarity-badge-inline {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-}
-
-/* Stats List */
-.stats-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.stat-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 8px 0;
-}
-
-.stat-icon {
-    color: #ff6b35;
-    font-weight: bold;
-    font-size: 0.8rem;
-    margin-top: 3px;
-    flex-shrink: 0;
-}
-
-.stat-text {
-    color: #cccccc;
-    font-size: 0.95rem;
-    line-height: 1.5;
 }
 
 /* Alert Styles */
@@ -351,7 +298,7 @@
         font-size: 1rem;
     }
 
-    .rarity-badge-large {
+    .type-badge-large {
         top: 15px;
         right: 15px;
         padding: 8px 16px;
@@ -401,16 +348,11 @@
         font-size: 0.95rem;
     }
 
-    .rarity-badge-large {
+    .type-badge-large {
         top: 10px;
         right: 10px;
         padding: 6px 12px;
         font-size: 0.8rem;
-    }
-
-    .rarity-badge-inline {
-        font-size: 0.8rem;
-        padding: 6px 12px;
     }
 
     .info-text {

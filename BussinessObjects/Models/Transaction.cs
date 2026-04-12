@@ -29,8 +29,7 @@ namespace BussinessObjects.Models
 
         /// <summary>Số tiền VND thanh toán thực tế</summary>
         [Required]
-        [Column(TypeName = "decimal(18,0)")]
-        public decimal Amount { get; set; }
+        public int Amount { get; set; }
 
         /// <summary>Số VP (currency) user nhận được sau khi thanh toán</summary>
         [Required]
