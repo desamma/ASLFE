@@ -1,0 +1,143 @@
+﻿@page
+@model FE.Pages.Payment.IndexModel
+@{
+    ViewData["Title"] = "Top Up VP";
+    Layout = "_Layout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/payment.css" asp-append-version="true" />
+}
+
+<div class="payment-wrapper">
+
+    <div class="page-header">
+        <a href="/" class="back-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M5 12l7 7M5 12l7-7" />
+            </svg>
+            Home
+        </a>
+        <div class="page-title">Top Up <span>VP</span></div>
+    </div>
+
+    <div class="user-bar">
+        <div>
+            <div class="label">Account</div>
+            <div class="value">@Model.UserName</div>
+        </div>
+        <div class="vp-balance">
+            <div class="vp-icon">
+                <img src="/images/virtual-currency.png" alt="VP" style="width:28px;height:28px;object-fit:contain;" />
+            </div>
+            <div>
+                <div class="label">Current Balance</div>
+                <div class="value"><span id="page-vp-balance">@Model.CurrentVp.ToString("N0")</span> VP</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="topup">Top Up</button>
+        <button class="tab-btn" data-tab="history">Transaction History</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-topup">
+        <div class="topup-layout">
+
+            <div class="topup-left">
+                <div class="section-label">Select VP Package</div>
+                <div class="packages-grid" id="packages-grid">
+                    @for (int i = 0; i < 8; i++)
+                    {
+                        <div class="pkg-card skeleton">
+                            <div class="pkg-icon-wrap"><div class="pkg-icon-bg"></div></div>
+                            <div class="pkg-vp skeleton-bar" style="height:20px;border-radius:2px;margin:8px 20px"></div>
+                            <div class="pkg-bonus-text"></div>
+                            <div class="pkg-price skeleton-bar" style="height:16px;border-radius:2px;margin:12px 30px"></div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="topup-right">
+                <div class="section-label">Order Summary</div>
+                <div class="checkout-panel">
+                    <div id="checkout-detail">
+                        <div class="empty-selection">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11 9h2V7h-2m1 13c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m-1 15h2v-6h-2v6z" />
+                            </svg>
+                            <p>Select a VP package above</p>
+                        </div>
+                    </div>
+                </div>
+
+                @Html.AntiForgeryToken()
+
+                <button class="btn-pay" id="btn-pay" disabled>
+                    <span class="btn-text">Pay Now</span>
+                    <div class="spinner"></div>
+                </button>
+
+                <div class="pay-note">
+                    Secured by PayOS — Safe &amp; Trusted
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="tab-panel" id="tab-history">
+        <div class="history-table-wrap">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Package</th>
+                        <th>Amount</th>
+                        <th>VP Received</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Paid At</th>
+                    </tr>
+                </thead>
+                <tbody id="history-tbody">
+                    <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="empty-history hidden" id="history-empty">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z" />
+            </svg>
+            <p>You have no transactions yet</p>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        window.API_BASE = '/payment-proxy';
+    </script>
+    <script src="~/js/payment.js" asp-append-version="true"></script>
+    <script>
+        // Sync VP balance from API to Current Balance display
+        (async function () {
+            try {
+                const res = await fetch('/payment-proxy?path=balance', { credentials: 'include' });
+                if (!res.ok) return;
+                const json = await res.json();
+                const balance = json.balance ?? json.data?.balance;
+                if (balance !== undefined) {
+                    const formatted = new Intl.NumberFormat('en-US').format(balance);
+                    const el = document.getElementById('page-vp-balance');
+                    if (el) el.textContent = formatted;
+                }
+            } catch (e) {
+                console.warn('Could not fetch VP balance:', e);
+            }
+        })();
+    </script>
+}

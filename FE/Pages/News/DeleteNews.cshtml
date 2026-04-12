@@ -1,0 +1,33 @@
+@page "{id:guid}"
+@model DeleteNewsModel
+@{
+    ViewData["Title"] = "Delete News";
+}
+
+<div class="delete-page-container">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="error-message">
+            <p>@Model.ErrorMessage</p>
+            <a href="/News" class="btn-back">Back to News</a>
+        </div>
+    }
+    else if (Model.News != null)
+    {
+        <div class="delete-confirmation">
+            <h1>Delete News</h1>
+            <div class="news-preview">
+                <h2>@Model.News.Title</h2>
+                <p>@Model.News.Description</p>
+            </div>
+            <p class="warning-text">Are you sure you want to delete this news? This action cannot be undone.</p>
+            <div class="button-group">
+                <a href="/News/ReadNews/@Model.News.Id" class="btn-cancel">Cancel</a>
+                <form method="post" style="display: inline;">
+                    <input type="hidden" name="id" value="@Model.News.Id" />
+                    <button type="submit" class="btn-delete">Delete News</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,42 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Sign In";
+}
+
+<div class="signin-container">
+    <div class="signin-background">
+        <div class="signin-card">
+            <h1 class="signin-title">Login</h1>
+
+            <form method="post" class="signin-form">
+                <div asp-validation-summary="All" class="text-danger"></div>
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="validation-message" style="color: green; border-color: green;">@TempData["Success"]</div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <div class="validation-message">@Model.ErrorMessage</div>
+                }
+
+                <input asp-for="Input.Email" class="form-input" placeholder="Email" />
+                <span asp-validation-for="Input.Email"></span>
+
+                <input asp-for="Input.Password" type="password" class="form-input" placeholder="Password" />
+                <span asp-validation-for="Input.Password"></span>
+
+                <button type="submit" class="btn-login">
+                    Login
+                </button>
+            </form>
+
+            <div class="signin-footer">
+                <a href="/forgot-password" class="signin-link">Forgot password?</a>
+                <a href="/Auth/Register" class="signin-link">Create an account</a>
+            </div>
+        </div>
+    </div>
+</div>

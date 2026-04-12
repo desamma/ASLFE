@@ -1,0 +1,250 @@
+@page
+@model CreateNewsModel
+@{
+    ViewData["Title"] = Model.IsEditing ? "Edit Game News" : "Create Game News";
+}
+
+<div class="news-create-container">
+    <div class="news-create-card">
+        <h1 class="news-title">@(Model.IsEditing ? "Edit Game News" : "Create Game News")</h1>
+
+        <form method="post" enctype="multipart/form-data" class="news-form">
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <!-- Title Input -->
+            <div class="form-group">
+                <label for="Title" class="form-label">Title</label>
+                <input asp-for="Input.Title" type="text" class="form-control" placeholder="Enter news title" maxlength="500" />
+                <span asp-validation-for="Input.Title" class="text-danger"></span>
+            </div>
+
+            <!-- Banner Path Input -->
+            <div class="form-group">
+                <label for="BannerPath" class="form-label">Banner Image (Optional)</label>
+                <input asp-for="Input.BannerPath" type="text" class="form-control" placeholder="e.g., banner.jpg" />
+                <span asp-validation-for="Input.BannerPath" class="text-danger"></span>
+                <small class="form-text">Enter image filename from wwwroot/images folder</small>
+            </div>
+
+            <!-- Description Input -->
+            <div class="form-group">
+                <label for="Description" class="form-label">Description</label>
+                <textarea asp-for="Input.Description" class="form-control" placeholder="Enter news description" maxlength="500" rows="3"></textarea>
+                <span asp-validation-for="Input.Description" class="text-danger"></span>
+                <small class="form-text"><span id="descriptionCount">0</span>/500</small>
+            </div>
+
+            <!-- Rich Text Editor -->
+            <div class="form-group">
+                <label for="Content" class="form-label">Content</label>
+                <div class="editor-toolbar">
+                    <button type="button" class="editor-btn" onclick="addSeparator()" title="Add Separator">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <line x1="0" y1="12" x2="24" y2="12" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>Separator</span>
+                    </button>
+                    <button type="button" class="editor-btn" onclick="showImageDialog()" title="Add Image">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <rect x="2" y="2" width="20" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="8" cy="8" r="2" fill="currentColor"/>
+                            <path d="M2 16l6-6 8 8 8-8" stroke="currentColor" stroke-width="2" fill="none"/>
+                        </svg>
+                        <span>Image</span>
+                    </button>
+                    <button type="button" class="editor-btn" onclick="showImageBrowser()" title="Browse Images">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                        </svg>
+                        <span>Browse Images</span>
+                    </button>
+                </div>
+                <textarea asp-for="Input.Content" id="ContentEditor" class="editor-textarea" placeholder="Your content will appear here..."></textarea>
+                <span asp-validation-for="Input.Content" class="text-danger"></span>
+                <small class="form-text"><span id="contentCount">0</span>/10000</small>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="form-group">
+                <label class="form-label">Preview</label>
+                <div id="contentPreview" class="preview-box"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-submit">@(Model.IsEditing ? "Update News" : "Create News")</button>
+            @if (Model.IsEditing && Model.EditingNewsId.HasValue)
+            {
+                <a href="/News/ReadNews/@Model.EditingNewsId" class="btn-cancel">Cancel</a>
+            }
+        </form>
+    </div>
+</div>
+
+<!-- Image Dialog -->
+<div id="imageDialog" class="modal-overlay" style="display: none;" onclick="closeImageDialog(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Add Image</h2>
+            <button type="button" class="modal-close" onclick="closeImageDialog()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="imageName" class="form-label">Image Name</label>
+                <input type="text" id="imageName" class="form-control" placeholder="e.g., image.jpeg" />
+                <small class="form-text">Image must exist in wwwroot/images folder</small>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" onclick="closeImageDialog()">Cancel</button>
+            <button type="button" class="btn-primary" onclick="insertImage()">Insert Image</button>
+        </div>
+    </div>
+</div>
+
+<!-- Image Browser Dialog -->
+<div id="imageBrowserDialog" class="modal-overlay" style="display: none;" onclick="closeImageBrowser(event)">
+    <div class="modal-content modal-content-large" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Select Image</h2>
+            <button type="button" class="modal-close" onclick="closeImageBrowser()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="imageBrowserContent" class="image-browser-grid">
+                <div class="loading-spinner">Loading images...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" onclick="closeImageBrowser()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Modal -->
+<div id="notificationModal" class="modal-overlay" style="display: none;" onclick="closeNotificationModal(event)">
+    <div class="modal-content modal-notification" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2 id="notificationTitle">Notification</h2>
+            <button type="button" class="modal-close" onclick="closeNotificationModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="notificationContent" class="notification-content"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-primary" id="notificationBtn" onclick="handleNotificationAction()">OK</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/news-editor.js"></script>
+    <script>
+        let notificationAction = null;
+
+        function showNotification(title, message, type, actionCallback = null) {
+            const modal = document.getElementById('notificationModal');
+            const titleElem = document.getElementById('notificationTitle');
+            const contentElem = document.getElementById('notificationContent');
+            const btnElem = document.getElementById('notificationBtn');
+            
+            titleElem.textContent = title;
+            contentElem.innerHTML = `<div class="notification-${type}">${escapeHtml(message)}</div>`;
+            
+            // Add type-specific styling
+            if (type === 'success') {
+                btnElem.className = 'btn-primary btn-success';
+            } else if (type === 'error') {
+                btnElem.className = 'btn-primary btn-danger';
+            } else {
+                btnElem.className = 'btn-primary';
+            }
+            
+            notificationAction = actionCallback;
+            modal.style.display = 'flex';
+            btnElem.focus();
+        }
+
+        function closeNotificationModal(event) {
+            if (event && event.target.id !== 'notificationModal') return;
+            document.getElementById('notificationModal').style.display = 'none';
+            notificationAction = null;
+        }
+
+        function handleNotificationAction() {
+            closeNotificationModal();
+            if (notificationAction && typeof notificationAction === 'function') {
+                notificationAction();
+            }
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const descriptionInput = document.querySelector('[asp-for="Input.Description"]');
+            const contentEditor = document.getElementById('ContentEditor');
+            const previewBox = document.getElementById('contentPreview');
+
+            // Character counter for description
+            if (descriptionInput) {
+                descriptionInput.addEventListener('input', function() {
+                    document.getElementById('descriptionCount').textContent = this.value.length;
+                });
+            }
+
+            // Character counter for content
+            if (contentEditor) {
+                contentEditor.addEventListener('input', function() {
+                    document.getElementById('contentCount').textContent = this.value.length;
+                    updatePreview();
+                });
+            }
+
+            // Initial character counts
+            if (descriptionInput) {
+                document.getElementById('descriptionCount').textContent = descriptionInput.value.length;
+            }
+            if (contentEditor) {
+                document.getElementById('contentCount').textContent = contentEditor.value.length;
+                updatePreview();
+            }
+
+            // Show notification if there's a success or error message
+            const errorMessage = `@Model.ErrorMessage`;
+            const successMessage = `@Model.SuccessMessage`;
+
+            if (errorMessage && errorMessage.trim()) {
+                showNotification('Error', errorMessage, 'error');
+            } else if (successMessage && successMessage.trim()) {
+                showNotification(
+                    'Success',
+                    successMessage,
+                    'success',
+                    function() {
+                        @if (Model.IsEditing && Model.EditingNewsId.HasValue)
+                        {
+                            <text>
+                            window.location.href = '/News/ReadNews/@Model.EditingNewsId';
+                            </text>
+                        }
+                    }
+                );
+            }
+
+            // Allow closing notification modal with Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    const notificationModal = document.getElementById('notificationModal');
+                    if (notificationModal && notificationModal.style.display !== 'none') {
+                        closeNotificationModal();
+                    }
+                }
+            });
+        });
+    </script>
+}

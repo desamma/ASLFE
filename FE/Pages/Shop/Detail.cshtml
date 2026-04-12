@@ -1,0 +1,183 @@
+@page "{id:guid}"
+@model DetailModel
+@{
+    ViewData["Title"] = Model.ShopItem?.Name ?? "Shop Item Details";
+}
+
+<div class="detail-container">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="back-link-section">
+            <a href="/Shop" class="back-link">? Back to Shop</a>
+        </div>
+    }
+    else if (Model.ShopItem != null)
+    {
+        <!-- Back Link -->
+        <div class="back-link-section">
+            <a href="/Shop" class="back-link">? Back to Shop</a>
+        </div>
+
+        <!-- Detail Header -->
+        <section class="detail-header">
+            <div class="detail-header-content">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item"><a href="/Shop">Shop</a></span>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item">@Model.ShopItem.Category</span>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item active">@Model.ShopItem.Name</span>
+                </div>
+                <h1 class="detail-title">@Model.ShopItem.Name</h1>
+                @if (!string.IsNullOrEmpty(Model.ShopItem.Description))
+                {
+                    <p class="detail-subtitle">@Model.ShopItem.Description</p>
+                }
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <section class="detail-content">
+            <div class="detail-grid">
+                <!-- Left Column: Image -->
+                <div class="detail-image-section">
+                    <div class="image-wrapper">
+                        <img src="@Model.ShopItem.ImagePath" alt="@Model.ShopItem.Name" class="detail-image" />
+                        @if (Model.ShopItem.IsFeatured)
+                        {
+                            <span class="featured-badge-large">? Featured</span>
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.ShopItem.ItemType))
+                    {
+                        <div class="item-type-badge">
+                            <span class="badge-label">Type:</span>
+                            <span class="badge-value">@Model.ShopItem.ItemType</span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Right Column: Details and Purchase -->
+                <div class="detail-info-section">
+                    <!-- Item Category -->
+                    <div class="info-group">
+                        <h3 class="info-title">Category</h3>
+                        <p class="info-value">@Model.ShopItem.Category</p>
+                    </div>
+
+                    <!-- Item Details -->
+                    <div class="info-group">
+                        <h3 class="info-title">Item Details</h3>
+                        <div class="details-list">
+                            @if (Model.ShopItem.CurrencyAmount.HasValue && Model.ShopItem.CurrencyAmount > 0)
+                            {
+                                <div class="detail-item">
+                                    <span class="detail-label">Currency Reward:</span>
+                                    <span class="detail-value currency-value">
+                                        <img src="/images/virtual-currency.png" width="20" height="20" alt="gem" />
+                                        @Model.ShopItem.CurrencyAmount.Value.ToString("N0")
+                                    </span>
+                                </div>
+                            }
+                            @if (Model.ShopItem.ItemQuantity.HasValue && Model.ShopItem.ItemQuantity > 1)
+                            {
+                                <div class="detail-item">
+                                    <span class="detail-label">Quantity:</span>
+                                    <span class="detail-value">@Model.ShopItem.ItemQuantity</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(Model.ShopItem.ItemType))
+                            {
+                                <div class="detail-item">
+                                    <span class="detail-label">Type:</span>
+                                    <span class="detail-value">@Model.ShopItem.ItemType</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Price Section -->
+                    <div class="info-group price-section">
+                        <h3 class="info-title">Price</h3>
+                        @if (Model.ShopItem.Price.HasValue)
+                        {
+                            <div class="price-display @(Model.ShopItem.IsUsingPremiumCurrency ? "premium-price" : "regular-price")">
+                                @if (Model.ShopItem.IsUsingPremiumCurrency)
+                                {
+                                    <div class="price-icon">
+                                        <img src="/images/virtual-currency.png" width="40" height="40" alt="gem" />
+                                    </div>
+                                    <div class="price-text">
+                                        <span class="price-amount">@Model.ShopItem.Price.Value.ToString("N2")</span>
+                                        <span class="price-currency">Gems</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="price-icon">
+                                        <span class="currency-symbol">VND</span>
+                                    </div>
+                                    <div class="price-text">
+                                        <span class="price-amount">@Model.ShopItem.Price.Value.ToString("N2")</span>
+                                        <span class="price-currency">Vietnamese Dong</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Purchase Action -->
+                    <div class="purchase-section">
+                        <button class="btn-purchase-detail @(Model.ShopItem.IsUsingPremiumCurrency ? "" : "btn-purchase-detail-primary")" 
+                                onclick="purchaseItemDetail('@Model.ShopItem.Id')" 
+                                type="button">
+                            <span>@(Model.ShopItem.IsUsingPremiumCurrency ? "Purchase with Gems" : "Buy Now")</span>
+                        </button>
+                        <p class="purchase-note">
+                            @if (Model.ShopItem.IsUsingPremiumCurrency)
+                            {
+                                <span>Secure purchase with premium currency</span>
+                            }
+                            else
+                            {
+                                <span>Secure payment processing</span>
+                            }
+                        </p>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="info-group additional-info">
+                        <div class="info-item">
+                            <span class="info-icon">??</span>
+                            <span class="info-text">Added: @Model.ShopItem.CreatedDate.ToString("MMM d, yyyy")</span>
+                        </div>
+                        @if (Model.ShopItem.UpdatedDate.HasValue)
+                        {
+                            <div class="info-item">
+                                <span class="info-icon">??</span>
+                                <span class="info-text">Updated: @Model.ShopItem.UpdatedDate.Value.ToString("MMM d, yyyy")</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Related Items Section -->
+        <section class="related-items-section">
+            <h2 class="related-title">Similar Items</h2>
+            <p class="related-subtitle">You might also be interested in these items from the <strong>@Model.ShopItem.Category</strong> category</p>
+            <div class="related-items-placeholder">
+                <p>Loading similar items...</p>
+            </div>
+        </section>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/shop-detail.js"></script>
+}
