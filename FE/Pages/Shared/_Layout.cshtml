@@ -35,14 +35,9 @@
                         <a href="#">Modes</a>
                         <a href="#">Characters</a>
                         <a href="#">Ranking</a>
-                        @if (User.IsInRole("admin"))
-                        {
-                            <div class="dropdown-separator"></div>
-                            <a href="#">Manage Content</a>
-                            <a href="#">Analytics</a>
-                        }
                     </div>
                 </div>
+                
                 <div class="nav-item dropdown">
                     <button class="nav-button">
                         News
@@ -53,11 +48,6 @@
                     <div class="dropdown-menu">
                         <a href="/News">All News</a>
                         <a href="/News">Latest</a>
-                        @if (User.IsInRole("admin"))
-                        {
-                            <div class="dropdown-separator"></div>
-                            <a href="/News/CreateNews">Write Game News</a>
-                        }
                     </div>
                 </div>
 
@@ -72,6 +62,27 @@
                         Shop
                     </a>
                 </div>
+
+                @if (User.IsInRole("admin"))
+                {
+                    <div class="nav-item dropdown">
+                        <button class="nav-button" style="color: #a78bfa; font-weight: bold;">
+                            Admin Panel
+                            <svg viewBox="0 0 24 24" fill="currentColor" class="dropdown-icon">
+                                <path d="M7 10l5 5 5-5z" />
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="/Admin/AdminUsers">Manage Users</a>
+                            <a href="/Admin/AdminGacha">Gacha Items</a>
+                            <a href="/Admin/AdminPayment">Transactions</a>
+                            <div class="dropdown-separator"></div>
+                            <a href="/News/CreateNews">Write Game News</a>
+                            <a href="#">Manage Content</a>
+                            <a href="#">Analytics</a>
+                        </div>
+                    </div>
+                }
 
                 <div class="nav-item dropdown">
                     <a class="nav-button" style="text-decoration: none; display: flex; align-items: center; gap: 8px;" href="/Payment">
@@ -143,21 +154,21 @@
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
         <script>
-            // Fetch real VP balance from DB on every page load
-            (async function () {
-                try {
-                    const res = await fetch('/payment-proxy?path=balance', { credentials: 'include' });
-                    if (!res.ok) return;
-                    const json = await res.json();
-                    const balance = json.balance ?? json.data?.balance;
-                    if (balance !== undefined) {
-                        const el = document.getElementById('vp-balance-display');
-                        if (el) el.textContent = new Intl.NumberFormat('en-US').format(balance);
+                // Fetch real VP balance from DB on every page load
+                (async function () {
+                    try {
+                        const res = await fetch('/payment-proxy?path=balance', { credentials: 'include' });
+                        if (!res.ok) return;
+                        const json = await res.json();
+                        const balance = json.balance ?? json.data?.balance;
+                        if (balance !== undefined) {
+                            const el = document.getElementById('vp-balance-display');
+                            if (el) el.textContent = new Intl.NumberFormat('en-US').format(balance);
+                        }
+                    } catch (e) {
+                        console.warn('Could not fetch VP balance:', e);
                     }
-                } catch (e) {
-                    console.warn('Could not fetch VP balance:', e);
-                }
-            })();
+                })();
         </script>
     }
 
