@@ -1,0 +1,96 @@
+﻿@page "{id:guid}"
+@model DetailModel
+@{
+    ViewData["Title"] = Model.Item?.Name ?? "Item Details";
+}
+
+<div class="detail-container">
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div class="back-link-section">
+            <a href="/Items" class="back-link">Back to Items</a>
+        </div>
+    }
+    else if (Model.Item != null)
+    {
+        <!-- Back Link -->
+        <div class="back-link-section">
+            <a href="/Items" class="back-link">Back to Items</a>
+        </div>
+
+        <!-- Detail Header -->
+        <section class="detail-header">
+            <div class="detail-header-content">
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item"><a href="/Items">Items</a></span>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item">@Model.Item.Type</span>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-item active">@Model.Item.Name</span>
+                </div>
+                <h1 class="detail-title">@Model.Item.Name</h1>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <section class="detail-content">
+            <div class="detail-grid">
+                <!-- Left Column: Image -->
+                <div class="detail-image-section">
+                    <div class="image-wrapper">
+                        <img src="@Model.Item.ImagePath" alt="@Model.Item.Name" class="detail-image" />
+                        <span class="rarity-badge-large rarity-@Model.Item.Rarity.ToLower().Replace(" ", "-")">
+                            @Model.Item.Rarity
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Right Column: Details -->
+                <div class="detail-info-section">
+                    <!-- Item Type -->
+                    <div class="info-group">
+                        <h3 class="info-title">Type</h3>
+                        <p class="info-value">@Model.Item.Type</p>
+                    </div>
+
+                    <!-- Item Rarity -->
+                    <div class="info-group">
+                        <h3 class="info-title">Rarity</h3>
+                        <div class="rarity-display">
+                            <span class="rarity-badge-inline rarity-@Model.Item.Rarity.ToLower().Replace(" ", "-")">
+                                @Model.Item.Rarity
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Item Description -->
+                    <div class="info-group">
+                        <h3 class="info-title">Description</h3>
+                        <p class="info-description">@Model.Item.Description</p>
+                    </div>
+
+                    <!-- Item Stats -->
+                    @if (Model.Item.StatsLines != null && Model.Item.StatsLines.Any())
+                    {
+                        <div class="info-group">
+                            <h3 class="info-title">Stats</h3>
+                            <div class="stats-list">
+                                @foreach (var stat in Model.Item.StatsLines)
+                                {
+                                    <div class="stat-item">
+                                        <span class="stat-icon">⬥</span>
+                                        <span class="stat-text">@stat</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+</div>

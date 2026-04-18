@@ -1,0 +1,361 @@
+/* Detail Container */
+.detail-container {
+    background: linear-gradient(to bottom, #0a0a0a 0%, #1a1a1a 100%);
+    color: #ffffff;
+    min-height: 100vh;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    display: flex;
+    flex-direction: column;
+    margin-top: 3rem;
+}
+
+/* Back Link Section */
+.back-link-section {
+    padding: 20px 50px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #4a90e2;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.back-link:hover {
+    gap: 12px;
+    color: #6ab0ff;
+    text-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+}
+
+/* Detail Header */
+.detail-header {
+    background: linear-gradient(135deg, #0a0a3a 0%, #1a1a5a 50%, #0a0a2a 100%);
+    background-image: url('/images/shop-header-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: overlay;
+    padding: 40px 50px;
+    border-bottom: 2px solid #4a90e2;
+}
+
+.detail-header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+}
+
+.breadcrumb-item a {
+    color: #4a90e2;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: #6ab0ff;
+    text-decoration: underline;
+}
+
+.breadcrumb-item {
+    color: #cccccc;
+}
+
+.breadcrumb-item.active {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.breadcrumb-separator {
+    color: #888888;
+}
+
+.detail-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
+    color: #4a90e2;
+    text-shadow: 0 2px 10px rgba(74, 144, 226, 0.5);
+    letter-spacing: 1px;
+}
+
+/* Detail Content */
+.detail-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 60px 50px;
+    width: 100%;
+    flex: 1;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+}
+
+/* Detail Image Section */
+.detail-image-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    border: 2px solid rgba(74, 144, 226, 0.3);
+    background: linear-gradient(135deg, #0a1a3a 0%, #0a0a1a 100%);
+    padding: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.detail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.image-wrapper:hover .detail-image {
+    transform: scale(1.05);
+}
+
+.type-badge-large {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Type Badge Colors */
+.type-merchant {
+    background: #fbbf24;
+    color: #000000;
+    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6);
+}
+
+.type-questgiver {
+    background: #34d399;
+    color: #000000;
+    box-shadow: 0 6px 20px rgba(52, 211, 153, 0.6);
+}
+
+.type-dialogonly {
+    background: #60a5fa;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(96, 165, 250, 0.6);
+}
+
+.type-companion {
+    background: #c084fc;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(192, 132, 252, 0.6);
+}
+
+/* Detail Info Section */
+.detail-info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(74, 144, 226, 0.2);
+}
+
+.info-group:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #4a90e2;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 1.1rem;
+    color: #ffffff;
+    margin: 0;
+    font-weight: 500;
+}
+
+.info-description {
+    font-size: 1rem;
+    color: #cccccc;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Alert Styles */
+.alert {
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 15px 20px;
+    border-radius: 8px;
+}
+
+.alert-warning {
+    background: rgba(255, 152, 0, 0.1);
+    border: 2px solid #ff9800;
+    color: #ffb74d;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    color: #ffb74d;
+    opacity: 0.7;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .detail-title {
+        font-size: 2.5rem;
+    }
+
+    .image-wrapper {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .detail-header {
+        padding: 30px 20px;
+    }
+
+    .detail-title {
+        font-size: 2rem;
+    }
+
+    .back-link-section {
+        padding: 15px 20px;
+    }
+
+    .detail-content {
+        padding: 40px 20px;
+    }
+
+    .detail-grid {
+        gap: 30px;
+    }
+
+    .info-group {
+        padding-bottom: 15px;
+    }
+
+    .info-title {
+        font-size: 1rem;
+    }
+
+    .info-value {
+        font-size: 1rem;
+    }
+
+    .type-badge-large {
+        top: 15px;
+        right: 15px;
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .detail-header {
+        padding: 20px 15px;
+    }
+
+    .detail-title {
+        font-size: 1.5rem;
+    }
+
+    .breadcrumb {
+        font-size: 0.85rem;
+    }
+
+    .back-link-section {
+        padding: 10px 15px;
+    }
+
+    .detail-content {
+        padding: 20px 15px;
+    }
+
+    .detail-grid {
+        gap: 20px;
+    }
+
+    .image-wrapper {
+        padding: 20px;
+    }
+
+    .info-group {
+        padding-bottom: 12px;
+    }
+
+    .info-title {
+        font-size: 0.95rem;
+    }
+
+    .info-value,
+    .info-description {
+        font-size: 0.95rem;
+    }
+
+    .type-badge-large {
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    .info-text {
+        font-size: 0.9rem;
+    }
+}

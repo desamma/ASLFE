@@ -25,6 +25,7 @@ namespace BussinessObjects.Models
         [Required]
         public string ImagePath { get; set; } = string.Empty;
 
+        public List<string> StatsLines { get; set; } = new List<string>();
 
         public ICollection<UserItem> UserItems { get; set; } = new List<UserItem>();
 

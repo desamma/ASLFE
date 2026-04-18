@@ -1,0 +1,114 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "NPC Database";
+}
+
+<div class="npcs-container">
+    <!-- Page Header -->
+    <section class="npcs-header">
+        <div class="header-content">
+            <h1 class="npcs-title">NPC Directory</h1>
+            <p class="npcs-subtitle">Meet all characters, merchants, quest givers, and companions</p>
+        </div>
+        <div class="header-back">
+            <a href="/" class="back-link">Back to Home</a>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @Model.ErrorMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    else if (Model.NPCs.Any())
+    {
+        <!-- Filter Section -->
+        <section class="filter-section">
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="typeFilter" class="filter-label">NPC Type:</label>
+                    <select id="typeFilter" class="filter-select">
+                        <option style="color : black;" value="">All Types</option>
+                        @foreach (var type in Model.AvailableTypes)
+                        {
+                            <option style="color : black;" value="@type">@type</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="locationFilter" class="filter-label">Location:</label>
+                    <select id="locationFilter" class="filter-select">
+                        <option style="color : black;" value="">All Locations</option>
+                        @foreach (var location in Model.AvailableLocations)
+                        {
+                            <option style="color : black;" value="@location">@location</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="searchInput" class="filter-label">Search:</label>
+                    <input type="text" id="searchInput" class="filter-input" placeholder="Search by name or description..." />
+                </div>
+
+                <button id="resetFilters" class="btn-reset-filters">Reset Filters</button>
+            </div>
+            
+            <div class="filter-info">
+                <span id="npcCount" class="npc-count">Showing <strong>@Model.NPCs.Count</strong> NPCs</span>
+            </div>
+        </section>
+
+        <!-- NPCs Grid -->
+        <section class="npcs-content">
+            <div class="npcs-grid" id="npcsGrid">
+                @foreach (var npc in Model.NPCs)
+                {
+                    <div class="npc-card" data-type="@npc.NPCType" data-location="@(npc.Location ?? "")" data-name="@npc.Name" data-description="@(npc.Description ?? "")" data-id="@npc.Id">
+                        <div class="npc-image-wrapper">
+                            <img src="@npc.ImagePath" alt="@npc.Name" class="npc-image" />
+                            <span class="type-badge type-@npc.NPCType.ToLower().Replace(" ", "-")">
+                                @npc.DisplayType
+                            </span>
+                        </div>
+                        <div class="npc-info">
+                            <h3 class="npc-name">@npc.Name</h3>
+                            @if (!string.IsNullOrEmpty(npc.Location))
+                            {
+                                <p class="npc-location">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 21C15.5 17.4 19 14.1764 19 10.2C19 6.22355 15.866 3 12 3C8.13401 3 5 6.22355 5 10.2C5 14.1764 8.5 17.4 12 21Z" stroke="#4a90e2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 12C13.1046 12 14 11.1046 14 10C14 8.89543 13.1046 8 12 8C10.8954 8 10 8.89543 10 10C10 11.1046 10.8954 12 12 12Z" stroke="#4a90e2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                                    @npc.Location
+                                    </p>
+                            }
+                            @if (!string.IsNullOrEmpty(npc.Description))
+                            {
+                                <p class="npc-description">@npc.Description</p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="no-results" style="display: none;">
+            <div class="no-results-content">
+                <svg class="no-results-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <h2>No NPCs found</h2>
+                <p>Try adjusting your filters or search terms</p>
+                <button id="clearFiltersBtn" class="btn-clear-filters">Clear All Filters</button>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/npcs-filter.js"></script>
+}

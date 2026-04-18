@@ -62,6 +62,12 @@
                 </div>
 
                 <div class="nav-item dropdown">
+                    <a class="nav-button" style="text-decoration: none; color: #F37021; font-weight: bold;" href="/Gacha">
+                        Gacha
+                    </a>
+                </div>
+
+                <div class="nav-item dropdown">
                     <a class="nav-button" style="text-decoration: none;" href="/Shop">
                         Shop
                     </a>
@@ -84,7 +90,6 @@
                 var currencyAmount = User.FindFirst("CurrencyAmount")?.Value ?? "0";
 
                 <div class="user-profile-group" style="display: flex; align-items: center; gap: 12px;">
-                    <!-- Currency Badge — số VP được cập nhật live từ API -->
                     <div class="currency-badge-header" style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(255,215,0,0.1); border-radius: 6px; border: 1px solid rgba(255,215,0,0.3);">
                         <img src="/images/virtual-currency.png" alt="VP"
                              style="width: 24px; height: 24px; object-fit: contain;" />

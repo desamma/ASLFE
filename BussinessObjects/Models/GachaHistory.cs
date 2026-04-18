@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BussinessObjects.Models
 {
@@ -6,21 +7,42 @@ namespace BussinessObjects.Models
     {
         public Guid Id { get; set; }
 
+        // ✅ ADD THIS - User Reference
         [Required]
         public Guid UserId { get; set; }
-        public User? User { get; set; }
+        [ForeignKey("UserId")]
+        public virtual User? User { get; set; }
 
         [Required]
-        public Guid GachaItemId { get; set; }
-        public GachaItem? GachaItem { get; set; }
+        public Guid GachaBannerId { get; set; }
+        [ForeignKey("GachaBannerId")]
+        public virtual GachaBanner? GachaBanner { get; set; }
 
         [Required]
-        [DataType(DataType.DateTime)]
-        public DateTime Date { get; set; } = DateTime.Now;
+        public Guid ItemId { get; set; }
+        [ForeignKey("ItemId")]
+        public virtual Item? Item { get; set; }
 
-        public bool IsSuccess { get; set; }
+        [Range(1, 5)]
+        public int StarRating { get; set; }
 
-        [Required]
-        public decimal NewUserBalance { get; set; }
+        public bool IsFeatured { get; set; }
+
+        /// <summary>Pull này do pity kích hoạt</summary>
+        public bool WasPityTriggered { get; set; }
+
+        /// <summary>Thứ tự trong batch (1–10)</summary>
+        public int PullNumberInSession { get; set; }
+
+        /// <summary>Giá trị pity lúc pull</summary>
+        public int PityCounterSnapshot { get; set; }
+
+        /// <summary>"SinglePull" | "MultiPull"</summary>
+        [MaxLength(20)]
+        public string PullType { get; set; } = string.Empty;
+
+        public int GemsCost { get; set; }
+
+        public DateTime PulledAt { get; set; } = DateTime.Now;
     }
 }
