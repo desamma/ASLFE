@@ -2,7 +2,6 @@ using BussinessObjects.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text.Json;
@@ -13,12 +12,10 @@ namespace FE.Pages.Profile;
 public class IndexModel : PageModel
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly IWebHostEnvironment _hostingEnvironment;
 
-    public IndexModel(IHttpClientFactory httpClientFactory, IWebHostEnvironment hostingEnvironment)
+    public IndexModel(IHttpClientFactory httpClientFactory)
     {
         _httpClientFactory = httpClientFactory;
-        _hostingEnvironment = hostingEnvironment;
     }
 
     [BindProperty]
@@ -129,21 +126,60 @@ public class IndexModel : PageModel
                     return Page();
                 }
 
-                // Save file to wwwroot/images
-                var uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "images");
-                if (!Directory.Exists(uploadsFolder))
-                    Directory.CreateDirectory(uploadsFolder);
-
-                var fileName = $"{userId}_{DateTime.Now.Ticks}{fileExtension}";
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                // Delete old avatar from Firebase Storage if it exists
+                if (!string.IsNullOrEmpty(user.UserAvatar))
                 {
-                    await AvatarFile.CopyToAsync(fileStream);
+                    try
+                    {
+                        var deleteRequest = new DeleteMultipleFilesRequest
+                        {
+                            FilePaths = allowedExtensions
+                                .Select(ext => $"images/userAvatar/{userId}{ext}")
+                                .ToList()
+                        };
+
+                        var deleteContent = new StringContent(JsonSerializer.Serialize(deleteRequest), System.Text.Encoding.UTF8, "application/json");
+                        var deleteMessage = new HttpRequestMessage(HttpMethod.Delete, "api/firebasestorage/delete-multiple")
+                        {
+                            Content = deleteContent
+                        };
+                        await client.SendAsync(deleteMessage);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the error but continue with new upload
+                        Console.WriteLine($"Error deleting old avatar: {ex.Message}");
+                    }
                 }
 
-                avatarPath = $"/images/{fileName}";
+                // Upload new avatar to Firebase Storage
+                using var formContent = new MultipartFormDataContent();
+                using var fileStream = AvatarFile.OpenReadStream();
+
+                var streamContent = new StreamContent(fileStream);
+                streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(AvatarFile.ContentType);
+                var avatarFileName = $"{userId}{fileExtension}";
+                formContent.Add(streamContent, "file", avatarFileName);
+                formContent.Add(new StringContent("images/userAvatar/"), "folderPath");
+
+                var uploadResponse = await client.PostAsync("api/firebasestorage/upload", formContent);
+
+                if (!uploadResponse.IsSuccessStatusCode)
+                {
+                    ErrorMessage = "Failed to upload avatar.";
+                    return Page();
+                }
+
+                var uploadContent = await uploadResponse.Content.ReadAsStringAsync();
+                var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var uploadResult = JsonSerializer.Deserialize<UploadResponse>(uploadContent, jsonOptions);
+
+                if (uploadResult?.Url != null)
+                {
+                    avatarPath = uploadResult.Url;
+                }
             }
+
             var request = new UserUpdateRequest
             {
                 UserName = UserProfile.UserName,
@@ -220,5 +256,16 @@ public class IndexModel : PageModel
         public bool IsBanned { get; set; }
         public decimal CurrencyAmount { get; set; }
         public int PityCounter { get; set; }
+    }
+
+    public class UploadResponse
+    {
+        public string? Url { get; set; }
+        public string? FileName { get; set; }
+    }
+
+    public class DeleteMultipleFilesRequest
+    {
+        public List<string> FilePaths { get; set; } = new();
     }
 }
