@@ -1,0 +1,111 @@
+﻿.admin-wrapper {
+    background-color: #1e1e24;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    color: #e5e7eb;
+}
+
+.admin-title {
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+.custom-tabs {
+    display: flex;
+    gap: 15px;
+    border-bottom: 2px solid #333;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+}
+
+.tab-btn {
+    background: transparent;
+    color: #9ca3af;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none !important;
+    outline: none !important;
+}
+
+    .tab-btn:hover {
+        background-color: rgba(255,255,255,0.05);
+        color: #fff;
+    }
+
+    .tab-btn.tab-active {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+        color: white !important;
+        border: none !important;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+        transform: translateY(-2px);
+    }
+
+.admin-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+    .admin-table th {
+        background-color: #25252d;
+        color: #9ca3af;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px;
+        border-bottom: 1px solid #444;
+        text-align: center !important;
+        vertical-align: middle;
+    }
+
+    .admin-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #2d2d35;
+        text-align: center !important;
+        vertical-align: middle;
+    }
+
+    .admin-table tbody tr:hover td {
+        background-color: #282833;
+    }
+
+.badge-custom {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.status-paid {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-pending {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-cancelled {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-default {
+    background-color: #374151;
+    color: #d1d5db;
+    border: 1px solid #4b5563;
+}
