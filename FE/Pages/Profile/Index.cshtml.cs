@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace FE.Pages.Profile;
 
@@ -101,7 +103,20 @@ public class IndexModel : PageModel
                 return RedirectToPage("/Auth/Login");
 
             var client = _httpClientFactory.CreateClient("Api");
-            var user = await client.GetFromJsonAsync<User>($"api/user/{userId}");
+            var rawResponse = await client.GetAsync($"api/user/{userId}");
+            if (!rawResponse.IsSuccessStatusCode)
+                return RedirectToPage("/Auth/Login");
+
+            var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var content = await rawResponse.Content.ReadAsStringAsync();
+            var jsonElement = JsonSerializer.Deserialize<JsonElement>(content, jsonOptions);
+
+            User? user = null;
+            if (jsonElement.ValueKind == JsonValueKind.Object && 
+                jsonElement.TryGetProperty("data", out var dataProperty))
+            {
+                user = JsonSerializer.Deserialize<User>(dataProperty.GetRawText(), jsonOptions);
+            }
 
             if (user == null)
                 return RedirectToPage("/Auth/Login");
@@ -171,7 +186,6 @@ public class IndexModel : PageModel
                 }
 
                 var uploadContent = await uploadResponse.Content.ReadAsStringAsync();
-                var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var uploadResult = JsonSerializer.Deserialize<UploadResponse>(uploadContent, jsonOptions);
 
                 if (uploadResult?.Url != null)
@@ -187,6 +201,7 @@ public class IndexModel : PageModel
                 PhoneNumber = UserProfile.PhoneNumber ?? string.Empty,
                 Gender = UserProfile.Gender,
                 UserAvatar = avatarPath ?? string.Empty,
+                SaveFilePath = string.Empty,
                 UserDOB = UserProfile.UserDOB,
                 CurrencyAmount = user.CurrencyAmount,
                 IsBanned = user.IsBanned,
@@ -197,6 +212,31 @@ public class IndexModel : PageModel
 
             if (response.IsSuccessStatusCode)
             {
+                // Update the Avatar claim in the current user's identity
+                if (!string.IsNullOrEmpty(avatarPath))
+                {
+                    var identity = User.Identity as ClaimsIdentity;
+                    if (identity != null)
+                    {
+                        var existingAvatarClaim = identity.FindFirst("Avatar");
+                        if (existingAvatarClaim != null)
+                        {
+                            identity.RemoveClaim(existingAvatarClaim);
+                        }
+                        identity.AddClaim(new Claim("Avatar", avatarPath));
+                        
+                        var principal = new ClaimsPrincipal(identity);
+                        await HttpContext.SignInAsync(
+                            CookieAuthenticationDefaults.AuthenticationScheme,
+                            principal,
+                            new AuthenticationProperties
+                            {
+                                IsPersistent = true,
+                                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(12)
+                            });
+                    }
+                }
+                
                 SuccessMessage = "Profile updated successfully!";
                 return await OnGetAsync();
             }
@@ -240,21 +280,22 @@ public class IndexModel : PageModel
         public byte Gender { get; set; } // 0: male, 1: female, 3: other
 
         [Display(Name = "Currency Amount")]
-        public decimal CurrencyAmount { get; set; }
+        public int CurrencyAmount { get; set; }
 
         public string? UserAvatar { get; set; }
     }
 
     public class UserUpdateRequest
     {
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public string PhoneNumber { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
         public DateOnly? UserDOB { get; set; }
         public byte Gender { get; set; }
-        public string UserAvatar { get; set; }
+        public string UserAvatar { get; set; } = string.Empty;
+        public string SaveFilePath { get; set; } = string.Empty;
         public bool IsBanned { get; set; }
-        public decimal CurrencyAmount { get; set; }
+        public int CurrencyAmount { get; set; }
         public int PityCounter { get; set; }
     }
 
