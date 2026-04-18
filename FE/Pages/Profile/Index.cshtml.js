@@ -1,67 +1,29 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const fileInput = document.querySelector('input[type="file"][name="AvatarFile"]');
-    const uploadBox = document.querySelector('.avatar-upload-box');
+    // Try multiple selectors to find the file input
+    const fileInput = document.querySelector('input[type="file"]') || document.querySelector('[name="AvatarFile"]');
     const previewContainer = document.getElementById('uploadPreview');
     const previewImage = document.getElementById('previewImage');
 
-    if (!fileInput) return;
-
-    // File selection
-    fileInput.addEventListener('change', handleFileSelect);
-
-    // Drag and drop
-    if (uploadBox) {
-        uploadBox.addEventListener('dragover', handleDragOver);
-        uploadBox.addEventListener('dragleave', handleDragLeave);
-        uploadBox.addEventListener('drop', handleDrop);
+    if (!fileInput || !previewContainer || !previewImage) {
+        console.warn('Required elements not found for image preview');
+        return;
     }
 
-    function handleFileSelect(event) {
+    fileInput.addEventListener('change', function (event) {
         const file = event.target.files?.[0];
         if (file) {
-            displayPreview(file);
-        }
-    }
-
-    function handleDragOver(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        uploadBox.classList.add('dragover');
-    }
-
-    function handleDragLeave(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        uploadBox.classList.remove('dragover');
-    }
-
-    function handleDrop(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        uploadBox.classList.remove('dragover');
-
-        const files = event.dataTransfer?.files;
-        if (files && files.length > 0) {
-            const file = files[0];
-            
-            // Validate file type
+            // Validate file is an image
             if (!file.type.startsWith('image/')) {
-                alert('Please select an image file');
+                alert('Please select a valid image file');
                 return;
             }
 
-            // Set file to input
-            fileInput.files = files;
-            displayPreview(file);
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImage.src = e.target?.result;
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
         }
-    }
-
-    function displayPreview(file) {
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            previewImage.src = event.target?.result;
-            previewContainer.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    }
+    });
 });

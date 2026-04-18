@@ -77,21 +77,15 @@
                     <div class="avatar-upload-section">
                         <h2 class="section-title">Update Avatar</h2>
                         <div class="avatar-upload-wrapper">
-                            <label class="avatar-upload-input">
-                                <input type="file" asp-for="AvatarFile" accept="image/*" class="file-input-hidden" />
-                                <div class="avatar-upload-box">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="upload-icon">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="17 8 12 3 7 8"></polyline>
-                                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                                    </svg>
-                                    <p class="upload-text">Click to select an image<br><small>or drag and drop</small></p>
-                                    <small class="upload-hint">Max 5MB • JPG, PNG, GIF, WebP</small>
-                                </div>
-                            </label>
-                            <div id="uploadPreview" class="upload-preview" style="display: none;">
-                                <img id="previewImage" alt="Preview" />
+                            <div class="form-group">
+                                <label asp-for="AvatarFile" class="form-label">Select Image</label>
+                                <input asp-for="AvatarFile" type="file" accept="image/*" class="form-control" />
+                                <small class="form-text text-muted">Max 5MB – JPG, PNG, GIF, WebP</small>
                             </div>
+                        </div>
+                        <div id="uploadPreview" class="upload-preview" style="display: none;">
+                            <p class="preview-label">Preview:</p>
+                            <img id="previewImage" alt="Preview" />
                         </div>
                     </div>
                 }
@@ -157,7 +151,3 @@
         </div>
     }
 </div>
-
-@section Scripts {
-    <script src="~/FE/Pages/Profile/Index.cshtml.js"></script>
-}
