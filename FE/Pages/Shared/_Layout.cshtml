@@ -86,12 +86,31 @@
 
                 <div class="nav-item dropdown">
                     <a class="nav-button" style="text-decoration: none; display: flex; align-items: center; gap: 8px;" href="/Payment">
-                        <svg viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px;">
-                            <path d="M20 8H4V6h16m0 12H4v2h16m0-6H4v2h16z" />
+                        <svg fill="#ffffff" viewBox="0 0 32.00 32.00" width="24" height="24" id="icon" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff" stroke-width="0.00032">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <defs>
+                                    <style>
+                                        .cls-1 {
+                                            fill: none;
+                                        }</style>
+                                </defs><title>purchase</title><path d="M28,6H4A2,2,0,0,0,2,8V24a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V8A2,2,0,0,0,28,6Zm0,2v3H4V8ZM4,24V13H28V24Z" transform="translate(0 0)"></path><rect x="6" y="20" width="10" height="2"></rect><rect id="_Transparent_Rectangle_" data-name="&lt;Transparent Rectangle&gt;" class="cls-1" width="32" height="32"></rect>
+                            </g>
                         </svg>
                         Purchase
                     </a>
                 </div>
+
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <div class="nav-item dropdown">
+                        <a class="nav-button" style="text-decoration: none; display: flex; align-items: center; gap: 8px;" href="/Inventory">
+                            <svg viewBox="0 0 64 64" width="24" height="24" id="Layer_1" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#ffffff" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M50.522,60.004H13.478c-5.502,0-9.978-4.476-9.978-9.978V23.597c0-5.502,4.476-9.978,9.978-9.978 h37.044c5.502,0,9.978,4.476,9.978,9.978v26.429C60.5,55.528,56.024,60.004,50.522,60.004z M13.478,19.429 c-2.298,0-4.168,1.87-4.168,4.168v26.429c0,2.298,1.87,4.168,4.168,4.168h37.044c2.298,0,4.168-1.87,4.168-4.168V23.597 c0-2.298-1.87-4.168-4.168-4.168H13.478z" style="fill:#ffffff;"></path> </g> <g> <path d="M57.4,34.525H6.405c-1.604,0-2.905-1.301-2.905-2.905c0-1.604,1.301-2.905,2.905-2.905H57.4 c1.604,0,2.905,1.301,2.905,2.905C60.305,33.224,59.005,34.525,57.4,34.525z" style="fill:#ffffff;"></path> </g> <g> <path d="M39.714,19.429c-1.604,0-2.905-1.301-2.905-2.905V9.806h-9.972v6.718 c0,1.604-1.301,2.905-2.905,2.905s-2.905-1.301-2.905-2.905V9.775c0-3.187,2.593-5.779,5.779-5.779H36.84 c3.187,0,5.779,2.593,5.779,5.779v6.749C42.619,18.129,41.318,19.429,39.714,19.429z" style="fill:#ffffff;"></path> </g> <g> <path d="M43.395,39.717c-1.604,0-2.905-1.301-2.905-2.905V31.62c0-1.604,1.301-2.905,2.905-2.905 S46.3,30.016,46.3,31.62v5.191C46.3,38.416,44.999,39.717,43.395,39.717z" style="fill:#ffffff;"></path> </g> <g> <path d="M20.687,39.717c-1.604,0-2.905-1.301-2.905-2.905V31.62c0-1.604,1.301-2.905,2.905-2.905 c1.604,0,2.905,1.301,2.905,2.905v5.191C23.592,38.416,22.291,39.717,20.687,39.717z" style="fill:#ffffff;"></path> </g> </g> </g></svg>
+                            Inventory
+                        </a>
+                    </div>
+                }
             </nav>
 
             @if (User.Identity != null && User.Identity.IsAuthenticated)
