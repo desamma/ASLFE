@@ -47,7 +47,7 @@ namespace BussinessObjects.Models
 
         public ICollection<UserItem> UserItems { get; set; } = new List<UserItem>();
 
-        public ICollection<GachaHistory> GachaHistories { get; set; } = new List<GachaHistory>();
+       
 
         public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 

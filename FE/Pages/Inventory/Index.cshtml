@@ -105,11 +105,28 @@
 
                                     <div class="tooltip-type">
                                         <strong>Type:</strong> @item.Type
+                                        @if (item.IsItemGachaOnly)
+                                        {
+                                            <span>Gacha Only</span>
+                                        }
                                     </div>
 
                                     <div class="tooltip-description">
                                         @item.Description
                                     </div>
+
+                                    @if (item.StatsLines.Any())
+                                    {
+                                        <div class="tooltip-stats">
+                                            <strong>Stats:</strong>
+                                            <ul>
+                                                @foreach (var stat in item.StatsLines)
+                                                {
+                                                    <li>@stat</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
 
                                     <div class="tooltip-quantity">
                                         <strong>Total Quantity:</strong> @item.Quantity
@@ -158,10 +175,6 @@
                     <div class="stat-item">
                         <span class="stat-label">Pending</span>
                         <span class="stat-value">@Model.UserItems.Sum(x => x.QuantityPending)</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Rarity Count</span>
-                        <span class="stat-value">@Model.UserItems.Select(x => x.Rarity).Distinct().Count()</span>
                     </div>
                 </div>
             </section>
