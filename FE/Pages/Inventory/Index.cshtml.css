@@ -648,3 +648,190 @@
         font-size: 0.8rem;
     }
 }
+
+/* RPG Inventory Theme Overrides */
+.inventory-container {
+    --rpg-gold: #d7b775;
+    --rpg-gold-soft: #8f7440;
+    --rpg-bg-dark: #12100d;
+    --rpg-panel: rgba(26, 20, 14, 0.9);
+    --rpg-panel-border: rgba(215, 183, 117, 0.35);
+    --rpg-slot: #201913;
+    --rpg-slot-border: #5d4727;
+    --rpg-text: #ece1cb;
+    --rpg-muted: #b7a88b;
+}
+
+.inventory-container {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(215, 183, 117, 0.08), transparent 35%),
+        radial-gradient(circle at 80% 80%, rgba(90, 60, 22, 0.2), transparent 40%),
+        linear-gradient(180deg, rgba(8, 7, 6, 0.88) 0%, rgba(16, 13, 10, 0.9) 100%),
+        url('/images/mhbackground.jpg') center/cover no-repeat;
+    color: var(--rpg-text);
+}
+
+.inventory-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--rpg-gold);
+    text-shadow: 0 0 14px rgba(215, 183, 117, 0.35), 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.inventory-subtitle {
+    color: var(--rpg-muted);
+}
+
+.inventory-controls,
+.inventory-stats,
+.empty-state {
+    background: linear-gradient(180deg, rgba(33, 26, 19, 0.95), rgba(23, 18, 13, 0.95));
+    border: 1px solid var(--rpg-panel-border);
+    box-shadow: inset 0 0 0 1px rgba(255, 230, 180, 0.05), 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+.search-input,
+.filter-btn {
+    background: rgba(17, 14, 11, 0.9);
+    color: var(--rpg-text);
+    border-color: var(--rpg-slot-border);
+}
+
+.search-input::placeholder {
+    color: rgba(225, 208, 173, 0.55);
+}
+
+.filter-btn:hover {
+    border-color: var(--rpg-gold);
+    color: var(--rpg-gold);
+}
+
+.filter-btn.active {
+    background: linear-gradient(180deg, #6f582f 0%, #4d3c20 100%);
+    border-color: var(--rpg-gold);
+    color: #fff3d8;
+}
+
+.inventory-grid {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 1.1rem;
+}
+
+.item-card {
+    background: linear-gradient(180deg, #2a2119 0%, #1b1510 100%);
+    border: 1px solid var(--rpg-slot-border);
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 235, 196, 0.04);
+}
+
+.item-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--rpg-gold);
+    box-shadow: 0 14px 24px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(215, 183, 117, 0.25);
+}
+
+.item-image-wrapper {
+    background: radial-gradient(circle at 50% 20%, #3a2d1f 0%, var(--rpg-slot) 65%);
+    border-bottom: 1px solid rgba(215, 183, 117, 0.2);
+}
+
+.item-image {
+    object-fit: contain;
+    padding: 10px;
+}
+
+.item-name {
+    color: #f5e8c9;
+    font-family: Georgia, 'Times New Roman', serif;
+}
+
+.item-type {
+    color: var(--rpg-muted);
+    letter-spacing: 0.4px;
+}
+
+.quantity-badge {
+    border-radius: 8px;
+    min-width: 28px;
+    height: 26px;
+    background: linear-gradient(180deg, #7b6136 0%, #4f3d21 100%);
+    border: 1px solid rgba(235, 211, 156, 0.35);
+    color: #fff4d8;
+}
+
+.rarity-badge,
+.delivery-status {
+    border: 1px solid rgba(255, 235, 196, 0.25);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.item-tooltip {
+    background: linear-gradient(180deg, rgba(31, 24, 17, 0.98), rgba(18, 14, 10, 0.98));
+    border: 1px solid rgba(215, 183, 117, 0.45);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+}
+
+.item-tooltip::after {
+    background: rgba(20, 16, 12, 0.98);
+    border-right-color: rgba(215, 183, 117, 0.45);
+    border-bottom-color: rgba(215, 183, 117, 0.45);
+}
+
+.tooltip-header {
+    border-bottom-color: rgba(215, 183, 117, 0.25);
+}
+
+.tooltip-title,
+.tooltip-rarity,
+.tooltip-type strong,
+.tooltip-quantity strong,
+.tooltip-delivery strong,
+.tooltip-stats strong {
+    color: #f2dfb2;
+}
+
+.tooltip-description,
+.tooltip-created-date,
+.tooltip-type,
+.tooltip-quantity,
+.tooltip-delivery,
+.tooltip-stats li {
+    color: var(--rpg-text);
+}
+
+.tooltip-stats ul {
+    margin: 0.5rem 0 0;
+    padding-left: 1.1rem;
+}
+
+.stat-item {
+    background: linear-gradient(180deg, #2b2219 0%, #1a140f 100%);
+    border: 1px solid rgba(215, 183, 117, 0.2);
+}
+
+.stat-label {
+    color: var(--rpg-muted);
+}
+
+.stat-value {
+    background: linear-gradient(180deg, #f6e3b7 0%, #c89f56 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.btn-primary,
+.btn-secondary,
+.back-link {
+    background: linear-gradient(180deg, #7a6135 0%, #4e3d20 100%);
+    border: 1px solid rgba(245, 219, 162, 0.3);
+    color: #fff4d8 !important;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover,
+.back-link:hover {
+    background: linear-gradient(180deg, #8a6f3e 0%, #5d4727 100%);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+}

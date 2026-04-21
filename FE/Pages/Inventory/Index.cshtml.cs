@@ -62,7 +62,9 @@ public class IndexModel : PageModel
                         Type = ui.Item?.Type ?? "Unknown",
                         Rarity = ui.Item?.Rarity ?? "Common",
                         ImagePath = ui.Item?.ImagePath ?? string.Empty,
-                        StatsLines = new List<string>() // Stats are not included in the API response
+                        StatsLines = ui.Item?.StatsLines ?? new List<string>(),
+                        IsItemGachaOnly = ui.Item?.IsGachaOnly ?? false,
+                        IsItemActive = ui.Item?.IsActive ?? false
                     }).ToList();
                 }
             }
@@ -86,6 +88,8 @@ public class IndexModel : PageModel
         public string Rarity { get; set; } = string.Empty;
         public string ImagePath { get; set; } = string.Empty;
         public List<string> StatsLines { get; set; } = new();
+        public bool IsItemGachaOnly { get; set; }
+        public bool IsItemActive { get; set; }
         public int Quantity { get; set; }
         public int QuantityDelivered { get; set; }
         public int QuantityPending => Quantity - QuantityDelivered;
@@ -115,5 +119,8 @@ public class IndexModel : PageModel
         public string Type { get; set; } = string.Empty;
         public string Rarity { get; set; } = string.Empty;
         public string ImagePath { get; set; } = string.Empty;
+        public bool IsGachaOnly { get; set; }
+        public bool IsActive { get; set; }
+        public List<string> StatsLines { get; set; } = new();
     }
 }
