@@ -1,0 +1,261 @@
+﻿@page
+@model SubmitModel
+@{
+    ViewData["Title"] = "Submit Bug Report";
+}
+
+<link rel="stylesheet" href="~/css/bug-report.css" />
+
+<div class="bug-report-container">
+    <div class="bug-report-wrapper">
+        <!-- Header -->
+        <div class="bug-report-header">
+            <a href="/" class="back-btn">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                </svg>
+                Back
+            </a>
+            <h1 class="bug-report-title">Submit <span>Bug Report</span></h1>
+            <p class="bug-report-description">Help us improve the game. Report any issues you encounter and our team will investigate them immediately.</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bug-report-card">
+            <form method="post" class="bug-report-form">
+                <!-- Validation Summary -->
+                <div asp-validation-summary="All" class="validation-summary" style="display: none;"></div>
+
+                <!-- Title Input -->
+                <div class="form-group">
+                    <label for="Title" class="form-label">Bug Title *</label>
+                    <input asp-for="Input.Title" type="text" class="form-control" placeholder="Briefly describe the issue" maxlength="200" />
+                    <span asp-validation-for="Input.Title" class="text-danger"></span>
+                    <small class="form-text"><span id="titleCount">0</span>/200</small>
+                </div>
+
+                <!-- Description Input -->
+                <div class="form-group">
+                    <label for="Description" class="form-label">Description *</label>
+                    <textarea asp-for="Input.Description" class="form-control" placeholder="Provide a detailed description of what went wrong..." maxlength="2000"></textarea>
+                    <span asp-validation-for="Input.Description" class="text-danger"></span>
+                    <small class="form-text"><span id="descriptionCount">0</span>/2000</small>
+                </div>
+
+                <!-- Steps to Reproduce -->
+                <div class="form-group">
+                    <label for="Steps" class="form-label">Steps to Reproduce</label>
+                    <textarea asp-for="Input.Steps" class="form-control" placeholder="1. First action&#10;2. Second action&#10;3. What happens..." maxlength="500"></textarea>
+                    <span asp-validation-for="Input.Steps" class="text-danger"></span>
+                    <small class="form-text"><span id="stepsCount">0</span>/500</small>
+                </div>
+
+                <!-- Expected Behavior -->
+                <div class="form-group">
+                    <label for="ExpectedBehavior" class="form-label">Expected Behavior</label>
+                    <input asp-for="Input.ExpectedBehavior" type="text" class="form-control" placeholder="What should happen instead" maxlength="200" />
+                    <span asp-validation-for="Input.ExpectedBehavior" class="text-danger"></span>
+                    <small class="form-text"><span id="expectedCount">0</span>/200</small>
+                </div>
+
+                <!-- Severity Selection -->
+                <div class="form-group">
+                    <label class="form-label">Severity Level</label>
+                    <div class="severity-grid">
+                        <div class="severity-option">
+                            <input type="radio" id="sev-low" name="Input.Severity" value="Low" />
+                            <label for="sev-low" class="severity-label severity-low">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right: 4px;">
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                                Low
+                            </label>
+                        </div>
+                        <div class="severity-option">
+                            <input type="radio" id="sev-medium" name="Input.Severity" value="Medium" />
+                            <label for="sev-medium" class="severity-label severity-medium">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right: 4px;">
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                                Medium
+                            </label>
+                        </div>
+                        <div class="severity-option">
+                            <input type="radio" id="sev-high" name="Input.Severity" value="High" />
+                            <label for="sev-high" class="severity-label severity-high">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right: 4px;">
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                                High
+                            </label>
+                        </div>
+                        <div class="severity-option">
+                            <input type="radio" id="sev-critical" name="Input.Severity" value="Critical" />
+                            <label for="sev-critical" class="severity-label severity-critical">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right: 4px;">
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                                Critical
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="form-buttons">
+                    <button type="submit" class="btn-submit">Submit Report</button>
+                    <a href="/" class="btn-cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Modal -->
+<div id="notificationModal" class="modal-overlay" onclick="closeNotificationModal(event)">
+    <div class="modal-content modal-notification" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2 id="notificationTitle">Notification</h2>
+            <button type="button" class="modal-close" onclick="closeNotificationModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="notificationContent" class="notification-content"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-primary" id="notificationBtn" onclick="handleNotificationAction()">OK</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let notificationAction = null;
+
+        function showNotification(title, message, type, actionCallback = null) {
+            const modal = document.getElementById('notificationModal');
+            const titleElem = document.getElementById('notificationTitle');
+            const contentElem = document.getElementById('notificationContent');
+            const btnElem = document.getElementById('notificationBtn');
+
+            titleElem.textContent = title;
+            contentElem.innerHTML = `<div class="notification-${type}">${escapeHtml(message)}</div>`;
+
+            // Add type-specific styling
+            if (type === 'success') {
+                btnElem.className = 'btn-primary btn-success';
+            } else if (type === 'error') {
+                btnElem.className = 'btn-primary btn-danger';
+            } else {
+                btnElem.className = 'btn-primary';
+            }
+
+            notificationAction = actionCallback;
+            modal.classList.add('active');
+            btnElem.focus();
+        }
+
+        function closeNotificationModal(event) {
+            if (event && event.target.id !== 'notificationModal') return;
+            document.getElementById('notificationModal').classList.remove('active');
+            notificationAction = null;
+        }
+
+        function handleNotificationAction() {
+            closeNotificationModal();
+            if (notificationAction && typeof notificationAction === 'function') {
+                notificationAction();
+            }
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const titleInput = document.querySelector('[asp-for="Input.Title"]');
+            const descriptionInput = document.querySelector('[asp-for="Input.Description"]');
+            const stepsInput = document.querySelector('[asp-for="Input.Steps"]');
+            const expectedInput = document.querySelector('[asp-for="Input.ExpectedBehavior"]');
+            const validationSummary = document.querySelector('.validation-summary');
+
+            // Show validation summary if there are errors
+            if (validationSummary && validationSummary.querySelector('ul li')) {
+                validationSummary.style.display = 'block';
+            }
+
+            // Character counter for title
+            if (titleInput) {
+                titleInput.addEventListener('input', function () {
+                    document.getElementById('titleCount').textContent = this.value.length;
+                });
+            }
+
+            // Character counter for description
+            if (descriptionInput) {
+                descriptionInput.addEventListener('input', function () {
+                    document.getElementById('descriptionCount').textContent = this.value.length;
+                });
+            }
+
+            // Character counter for steps
+            if (stepsInput) {
+                stepsInput.addEventListener('input', function () {
+                    document.getElementById('stepsCount').textContent = this.value.length;
+                });
+            }
+
+            // Character counter for expected
+            if (expectedInput) {
+                expectedInput.addEventListener('input', function () {
+                    document.getElementById('expectedCount').textContent = this.value.length;
+                });
+            }
+
+            // Initial character counts
+            if (titleInput) {
+                document.getElementById('titleCount').textContent = titleInput.value.length;
+            }
+            if (descriptionInput) {
+                document.getElementById('descriptionCount').textContent = descriptionInput.value.length;
+            }
+            if (stepsInput) {
+                document.getElementById('stepsCount').textContent = stepsInput.value.length;
+            }
+            if (expectedInput) {
+                document.getElementById('expectedCount').textContent = expectedInput.value.length;
+            }
+
+            // Show notification if there's a success or error message
+            const errorMessage = `@Model.ErrorMessage`;
+            const successMessage = `@Model.SuccessMessage`;
+
+            if (errorMessage && errorMessage.trim()) {
+                showNotification('⚠️ Error', errorMessage, 'error');
+            } else if (successMessage && successMessage.trim()) {
+                showNotification(
+                    '✓ Success',
+                    successMessage,
+                    'success',
+                    function () {
+                        // Stay on page after success to allow submitting another report
+                    }
+                );
+            }
+
+            // Allow closing notification modal with Escape key
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    const notificationModal = document.getElementById('notificationModal');
+                    if (notificationModal && notificationModal.classList.contains('active')) {
+                        closeNotificationModal();
+                    }
+                }
+            });
+        });
+    </script>
+}
