@@ -32,9 +32,15 @@
                         </svg>
                     </button>
                     <div class="dropdown-menu">
-                        <a href="#">Modes</a>
-                        <a href="#">Characters</a>
-                        <a href="#">Ranking</a>
+                        <a href="/Items/Index">Items</a>
+                        <a href="/NPCs/Index">Npc</a>
+                        <a href="/BugReport/Submit">Bug report</a>
+                        @if (User.IsInRole("admin"))
+                        {
+                            <div class="dropdown-separator"></div>
+                            <a href="#">Manage Content</a>
+                            <a href="#">Analytics</a>
+                        }
                     </div>
                 </div>
                 
@@ -48,6 +54,11 @@
                     <div class="dropdown-menu">
                         <a href="/News">All News</a>
                         <a href="/News">Latest</a>
+                        @if (User.IsInRole("admin"))
+                        {
+                            <div class="dropdown-separator"></div>
+                            <a href="/News/CreateNews">Write Game News</a>
+                        }
                     </div>
                 </div>
 
