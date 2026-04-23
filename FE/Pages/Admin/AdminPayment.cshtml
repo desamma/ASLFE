@@ -1,0 +1,130 @@
+﻿@page
+@model FE.Pages.Admin.AdminPaymentModel
+@{
+    ViewData["Title"] = "Transactions Dashboard";
+}
+
+<div class="container-fluid admin-wrapper mt-4 mb-5">
+    <h2 class="admin-title">Transactions & Shop Dashboard</h2>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;">@Model.ErrorMessage</div>
+    }
+
+    <div class="custom-tabs">
+        <button class="tab-btn tab-active" id="btn-transactions" onclick="switchTab('transactions')">PayOS Deposits</button>
+        <button class="tab-btn" id="btn-shop" onclick="switchTab('shop')">Shop Purchases</button>
+    </div>
+
+    <div id="tab-transactions" style="display: block;">
+        <form method="get" style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+            <select asp-for="StatusFilter" style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-color: #1e1e24 !important; color: #fff !important; border: 1px solid #444 !important; border-radius: 8px; padding: 10px 40px 10px 15px; font-weight: 600; cursor: pointer; outline: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22white%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M7.247%2011.14%202.451%205.658C1.885%205.013%202.345%204%203.204%204h9.592a1%201%200%200%201%20.753%201.659l-4.796%205.48a1%201%200%200%201-1.506%200z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 12px center;">
+                <option value="" style="background: #25252d; color: white;">All Statuses</option>
+                <option value="Paid" style="background: #25252d; color: white;">Paid</option>
+                <option value="Pending" style="background: #25252d; color: white;">Pending</option>
+                <option value="Cancelled" style="background: #25252d; color: white;">Cancelled</option>
+            </select>
+            <button type="submit" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; border-radius: 8px; padding: 10px 24px; font-weight: 700; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">Filter</button>
+        </form>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Order Code</th>
+                        <th style="width: 15%;">User</th>
+                        <th style="width: 20%;">Package</th>
+                        <th style="width: 15%;">Amount (VND)</th>
+                        <th style="width: 10%;">Currency</th>
+                        <th style="width: 15%;">Date</th>
+                        <th style="width: 10%;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tx in Model.Transactions)
+                    {
+                        <tr>
+                            <td style="color: #6b7280; font-family: monospace;">#@tx.OrderCode</td>
+                            <td style="color: #fff; font-weight: 600;">@tx.UserName</td>
+                            <td style="color: #a1a1aa;">@tx.Name</td>
+                            <td style="color: #f87171; font-weight: 700;">@tx.Amount.ToString("N0") ₫</td>
+                            <td style="color: #10b981; font-weight: 700;">+@tx.CurrencyAwarded</td>
+                            <td style="color: #9ca3af; font-size: 0.85rem;">@tx.CreatedAt.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (tx.Status == "Paid")
+                                {
+                                    <span class="badge-custom status-paid">PAID</span>
+                                }
+                                else if (tx.Status == "Pending")
+                                {
+
+                                    <span class="badge-custom status-pending">PENDING</span>
+                                }
+                                else if (tx.Status == "Cancelled")
+                                {
+
+                                    <span class="badge-custom status-cancelled">CANCELLED</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge-custom status-default">@tx.Status</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="tab-shop" style="display: none;">
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">User</th>
+                        <th style="width: 25%;">Item Purchased</th>
+                        <th style="width: 10%;">Qty</th>
+                        <th style="width: 15%;">Pay Type</th>
+                        <th style="width: 15%;">Total Spent</th>
+                        <th style="width: 15%;">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var purchase in Model.ShopPurchases)
+                    {
+                        <tr>
+                            <td style="color: #fff; font-weight: 600;">@purchase.UserName</td>
+                            <td style="color: #f4f4f5; font-weight: 700;">@purchase.ShopItemName</td>
+                            <td style="color: #a1a1aa;">x @purchase.Quantity</td>
+                            <td><span class="badge-custom status-default">@purchase.PaymentType</span></td>
+                            <td style="color: #fca5a5; font-weight: 700;">- @purchase.AmountPaid</td>
+                            <td style="color: #9ca3af; font-size: 0.85rem;">@purchase.PurchaseDate.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function switchTab(tabName) {
+            document.getElementById('tab-transactions').style.display = 'none';
+            document.getElementById('tab-shop').style.display = 'none';
+            document.getElementById('btn-transactions').classList.remove('tab-active');
+            document.getElementById('btn-shop').classList.remove('tab-active');
+            
+            if(tabName === 'transactions') {
+                document.getElementById('tab-transactions').style.display = 'block';
+                document.getElementById('btn-transactions').classList.add('tab-active');
+            } else {
+                document.getElementById('tab-shop').style.display = 'block';
+                document.getElementById('btn-shop').classList.add('tab-active');
+            }
+        }
+    </script>
+}

@@ -1,0 +1,160 @@
+﻿@page
+@model FE.Pages.Admin.AdminGachaModel
+@{
+    ViewData["Title"] = "Gacha Items Management";
+}
+
+<div class="container-fluid admin-wrapper mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4" style="border-bottom: 2px solid #333; padding-bottom: 15px;">
+        <h2 class="admin-title m-0 border-0 p-0">Gacha Items Inventory</h2>
+        <button class="btn-primary-custom" type="button" onclick="openCreateModal()">+ Add New Item</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="validation-message alert alert-danger" style="margin-bottom: 20px;">@Model.ErrorMessage</div>
+    }
+
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">Image</th>
+                    <th style="width: 20%;">Item Name</th>
+                    <th style="width: 12%;">Type</th>
+                    <th style="width: 12%;">Rarity</th>
+                    <th style="width: 20%;">Description</th>
+                    <th style="width: 16%;">Stats</th>
+                    <th style="width: 10%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.ImagePath))
+                            {
+                                <img src="@item.ImagePath" alt="Img" class="item-img" />
+                            }
+                            else
+                            {
+                                <div class="item-img d-flex justify-content-center align-items-center" style="margin: 0 auto;"><span style="color: #666; font-size: 0.7rem;">No Img</span></div>
+                            }
+                        </td>
+                        <td style="color: #fff; font-weight: 600;">@item.Name</td>
+                        <td><span class="badge-custom badge-type">@item.Type</span></td>
+                        <td><span class="badge-custom badge-rarity">@item.Rarity</span></td>
+                        <td style="color: #9ca3af; font-size: 0.9rem;">@item.Description</td>
+                        <td style="color: #34d399; font-weight: 600; font-size: 0.85rem;">@string.Join(", ", item.StatsLines)</td>
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <button type="button" class="action-btn" onclick="openEditModal('@item.Id', '@item.Name', '@item.Description', '@item.Type', '@item.Rarity', '@item.ImagePath', '@string.Join(", ", item.StatsLines)')">Edit</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="custom-modal-overlay" id="createModal">
+    <div class="custom-modal">
+        <form method="post" asp-page-handler="Create" class="m-0">
+            <div class="modal-header-dark">
+                <h5 class="modal-title">Create New Item</h5>
+                <button type="button" class="btn-close-custom" onclick="closeCreateModal()">✖</button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-custom">
+                    <label class="form-label-custom">Item Name</label>
+                    <input type="text" name="name" class="dark-input" required />
+                </div>
+                <div class="mb-custom">
+                    <label class="form-label-custom">Description</label>
+                    <textarea name="description" class="dark-input" rows="2"></textarea>
+                </div>
+                <div class="form-row-custom">
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">Type</label>
+                        <input type="text" name="type" class="dark-input" required />
+                    </div>
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">Rarity</label>
+                        <input type="text" name="rarity" class="dark-input" required />
+                    </div>
+                </div>
+                <div class="mb-custom">
+                    <label class="form-label-custom">Image URL</label>
+                    <input type="text" name="imagePath" class="dark-input" />
+                </div>
+                <div class="mb-custom">
+                    <label class="form-label-custom">Stats (Comma-separated)</label>
+                    <input type="text" name="statsLinesStr" class="dark-input" />
+                </div>
+            </div>
+            <div class="modal-footer-dark border-0 pt-0 pb-4 px-4">
+                <button type="submit" class="btn-save-item">Save Item</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="custom-modal-overlay" id="editModal">
+    <div class="custom-modal">
+        <form method="post" asp-page-handler="Update" class="m-0">
+            <div class="modal-header-dark">
+                <h5 class="modal-title">Edit Item Info</h5>
+                <button type="button" class="btn-close-custom" onclick="closeEditModal()">✖</button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" name="id" id="edit_id" />
+                <div class="mb-custom">
+                    <label class="form-label-custom">Item Name</label>
+                    <input type="text" name="name" id="edit_name" class="dark-input" required />
+                </div>
+                <div class="mb-custom">
+                    <label class="form-label-custom">Description</label>
+                    <textarea name="description" id="edit_description" class="dark-input" rows="2"></textarea>
+                </div>
+                <div class="form-row-custom">
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">Type</label>
+                        <input type="text" name="type" id="edit_type" class="dark-input" required />
+                    </div>
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">Rarity</label>
+                        <input type="text" name="rarity" id="edit_rarity" class="dark-input" required />
+                    </div>
+                </div>
+                <div class="mb-custom">
+                    <label class="form-label-custom">Image URL</label>
+                    <input type="text" name="imagePath" id="edit_image" class="dark-input" />
+                </div>
+                <div class="mb-custom">
+                    <label class="form-label-custom">Stats (Comma-separated)</label>
+                    <input type="text" name="statsLinesStr" id="edit_stats" class="dark-input" />
+                </div>
+            </div>
+            <div class="modal-footer-dark border-0 pt-0 pb-4 px-4">
+                <button type="submit" class="btn-update-item">Update Item</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openCreateModal() { document.getElementById('createModal').classList.add('show'); }
+        function closeCreateModal() { document.getElementById('createModal').classList.remove('show'); }
+        function openEditModal(id, name, desc, type, rarity, image, stats) {
+            document.getElementById('edit_id').value = id; document.getElementById('edit_name').value = name;
+            document.getElementById('edit_description').value = desc; document.getElementById('edit_type').value = type;
+            document.getElementById('edit_rarity').value = rarity; document.getElementById('edit_image').value = image;
+            document.getElementById('edit_stats').value = stats;
+            document.getElementById('editModal').classList.add('show');
+        }
+        function closeEditModal() { document.getElementById('editModal').classList.remove('show'); }
+    </script>
+}

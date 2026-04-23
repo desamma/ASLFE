@@ -80,6 +80,11 @@ public class LoginModel : PageModel
                     ExpiresUtc = DateTimeOffset.UtcNow.AddHours(12)
                 });
 
+            if (loginResponse.Roles != null && loginResponse.Roles.Contains("admin"))
+            {
+                return RedirectToPage("/Admin/AdminUsers");
+            }
+
             return RedirectToPage("/Index");
         }
         catch
