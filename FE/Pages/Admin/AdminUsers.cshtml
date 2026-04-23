@@ -29,11 +29,10 @@
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th style="width: 15%;">Username</th>
+                    <th style="width: 20%;">Username</th>
                     <th style="width: 25%;">Email</th>
                     <th style="width: 15%;">Currency (VP)</th>
-                    <th style="width: 10%;">Pity</th>
-                    <th style="width: 10%;">Status</th>
+                    <th style="width: 15%;">Status</th>
                     <th style="width: 25%;">Actions</th>
                 </tr>
             </thead>
@@ -44,7 +43,6 @@
                         <td style="color: #fff; font-weight: 600;">@user.UserName</td>
                         <td style="color: #9ca3af;">@user.Email</td>
                         <td style="color: #34d399; font-weight: 700; font-size: 1.05rem;">@user.CurrencyAmount VP</td>
-                        <td>@user.PityCounter</td>
                         <td>
                             @if (user.IsBanned)
                             {
@@ -52,22 +50,18 @@
                             }
                             else
                             {
-
                                 <span class="status-badge status-active">ACTIVE</span>
                             }
                         </td>
                         <td>
-                            <div class="d-flex align-items-center justify-content-center gap-2" style="flex-wrap: nowrap; min-width: 250px;">
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <button type="button" class="action-btn btn-detail" style="width: 90px;" onclick="openDetailModal('@user.Id')">Details</button>
+                                
                                 <form method="post" asp-page-handler="ToggleBan" class="m-0">
                                     <input type="hidden" name="userId" value="@user.Id" />
-                                    <button type="submit" class="action-btn @(user.IsBanned ? "btn-unban" : "btn-ban")" style="width: 80px;">
+                                    <button type="submit" class="action-btn @(user.IsBanned ? "btn-unban" : "btn-ban")" style="width: 90px;">
                                         @(user.IsBanned ? "Unban" : "Ban")
                                     </button>
-                                </form>
-                                <form method="post" asp-page-handler="AdjustCurrency" class="m-0 d-flex align-items-center gap-2">
-                                    <input type="hidden" name="userId" value="@user.Id" />
-                                    <input type="number" name="amountChange" class="currency-input" placeholder="+/- VP" required />
-                                    <button type="submit" class="action-btn btn-save">Save</button>
                                 </form>
                             </div>
                         </td>
@@ -77,3 +71,104 @@
         </table>
     </div>
 </div>
+
+<div class="custom-modal-overlay" id="detailModal">
+    <div class="custom-modal">
+        <div class="modal-header-dark">
+            <h5 class="modal-title">User Details</h5>
+            <button type="button" class="btn-close-custom" onclick="closeDetailModal()">✖</button>
+        </div>
+        <div class="modal-body p-4">
+            <div id="modalLoading" style="text-align: center; color: #a1a1aa;">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2">Loading data...</p>
+            </div>
+            <div id="modalContent" style="display: none;">
+                <div class="mb-custom">
+                    <label class="form-label-custom">User ID</label>
+                    <input type="text" id="det_id" class="dark-input" readonly style="background: #27272a; color: #9ca3af;" />
+                </div>
+                <div class="form-row-custom">
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">Username</label>
+                        <input type="text" id="det_username" class="dark-input" readonly />
+                    </div>
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">Currency</label>
+                        <input type="text" id="det_vp" class="dark-input" readonly style="color: #10b981; font-weight: bold;" />
+                    </div>
+                </div>
+                <div class="mb-custom">
+                    <label class="form-label-custom">Email</label>
+                    <input type="text" id="det_email" class="dark-input" readonly />
+                </div>
+                <div class="form-row-custom">
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">Phone Number</label>
+                        <input type="text" id="det_phone" class="dark-input" readonly />
+                    </div>
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">Created Date</label>
+                        <input type="text" id="det_created" class="dark-input" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer-dark border-0 pt-0 pb-4 px-4 text-end">
+            <button type="button" class="action-btn" style="background-color: #3f3f46; color: white; width: 90px;" onclick="closeDetailModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.remove('show');
+        }
+
+        async function openDetailModal(userId) {
+            document.getElementById('detailModal').classList.add('show');
+            document.getElementById('modalLoading').style.display = 'block';
+            document.getElementById('modalContent').style.display = 'none';
+
+            try {
+                // ĐÃ SỬA: Gọi API qua Handler của Razor Page thay vì gọi API BE trực tiếp
+                const response = await fetch(`?handler=Detail&userId=${userId}`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result && result.id) {
+                        document.getElementById('det_id').value = result.id || 'N/A';
+                        document.getElementById('det_username').value = result.userName || 'N/A';
+                        document.getElementById('det_email').value = result.email || 'N/A';
+                        document.getElementById('det_phone').value = result.phoneNumber || 'Not provided';
+                        document.getElementById('det_vp').value = (result.currencyAmount || 0) + ' VP';
+                        
+                        if (result.createdDate) {
+                            const date = new Date(result.createdDate);
+                            document.getElementById('det_created').value = date.toLocaleDateString('en-GB') + ' ' + date.toLocaleTimeString('en-GB');
+                        } else {
+                            document.getElementById('det_created').value = 'N/A';
+                        }
+
+                        document.getElementById('modalLoading').style.display = 'none';
+                        document.getElementById('modalContent').style.display = 'block';
+                    } else {
+                        alert("Failed to load user details.");
+                        closeDetailModal();
+                    }
+                } else {
+                    alert("Error fetching data. Status: " + response.status);
+                    closeDetailModal();
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                alert("Network error occurred.");
+                closeDetailModal();
+            }
+        }
+    </script>
+}

@@ -53,6 +53,27 @@ namespace FE.Pages.Admin
                 ErrorMessage = "Không thể kết nối đến máy chủ: " + ex.Message;
             }
         }
+        public async Task<IActionResult> OnGetDetailAsync(Guid userId)
+        {
+            var client = _httpClientFactory.CreateClient("Api");
+            try
+            {
+                var response = await client.GetAsync($"api/admin/users/{userId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<AdminUserDto>>();
+                    if (result != null && result.Success && result.Data != null)
+                    {
+                        return new JsonResult(result.Data);
+                    }
+                }
+                return new JsonResult(new { success = false, message = "User not found" });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = ex.Message });
+            }
+        }
 
         public async Task<IActionResult> OnPostToggleBanAsync(Guid userId)
         {
@@ -65,7 +86,6 @@ namespace FE.Pages.Admin
         {
             var client = _httpClientFactory.CreateClient("Api");
 
-            // Dữ liệu gửi đi (phải khớp với AdjustCurrencyDto ở Backend)
             var requestBody = new { AmountChange = amountChange };
             var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
 

@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Control Panel</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/FE.styles.css" asp-append-version="true" />
+    <style>
+        body { background-color: #0f0f13; color: #e5e7eb; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        .admin-sidebar { width: 260px; background-color: #18181b; border-right: 1px solid #27272a; display: flex; flex-direction: column; padding: 20px 0; }
+        .admin-logo { padding: 0 20px 20px; border-bottom: 1px solid #27272a; margin-bottom: 20px; color: #a78bfa; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .admin-nav-item { padding: 12px 20px; color: #a1a1aa; text-decoration: none; transition: 0.2s; display: block; }
+        .admin-nav-item:hover, .admin-nav-item.active { background-color: #27272a; color: #fff; border-left: 4px solid #a78bfa; }
+        .admin-main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .admin-topbar { height: 64px; background-color: #18181b; border-bottom: 1px solid #27272a; display: flex; justify-content: flex-end; align-items: center; padding: 0 30px; }
+        .admin-content { padding: 30px; }
+        
+        /* CSS cho nút Logout Admin cực mượt */
+        .btn-admin-logout {
+            background-color: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-admin-logout:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <nav class="admin-sidebar">
+        <div class="admin-logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width: 24px; height: 24px;">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            Admin Panel
+        </div>
+        <a href="/Admin/AdminUsers" class="admin-nav-item">Manage Users</a>
+        <a href="/Admin/AdminGacha" class="admin-nav-item">Gacha Items</a>
+        <a href="/Admin/AdminPayment" class="admin-nav-item">Transactions & Shop</a>
+        <a href="/News/CreateNews" class="admin-nav-item">Game News</a>
+    </nav>
+
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <div class="user-profile-group" style="display: flex; align-items: center; gap: 20px;">
+                <span style="color: white; font-weight: 500; font-size: 0.95rem;">Admin: @User.Identity?.Name</span>
+                
+                <form method="post" asp-page="/Auth/Logout" style="display:inline; margin: 0;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-admin-logout">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                            <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                        </svg>
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <main class="admin-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

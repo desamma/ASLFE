@@ -6,7 +6,7 @@
 
 <div class="container-fluid admin-wrapper mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4" style="border-bottom: 2px solid #333; padding-bottom: 15px;">
-        <h2 class="admin-title m-0 border-0 p-0">Gacha Items Inventory</h2>
+        <h2 class="admin-title m-0 border-0 p-0">Items Inventory Manager</h2>
         <button class="btn-primary-custom" type="button" onclick="openCreateModal()">+ Add New Item</button>
     </div>
 
@@ -35,7 +35,7 @@
                         <td>
                             @if (!string.IsNullOrEmpty(item.ImagePath))
                             {
-                                <img src="@item.ImagePath" alt="Img" class="item-img" />
+                                <img src="@item.ImagePath" alt="Img" class="item-img" style="background-color: transparent;" />
                             }
                             else
                             {
@@ -61,7 +61,7 @@
 
 <div class="custom-modal-overlay" id="createModal">
     <div class="custom-modal">
-        <form method="post" asp-page-handler="Create" class="m-0">
+        <form method="post" asp-page-handler="Create" class="m-0" enctype="multipart/form-data">
             <div class="modal-header-dark">
                 <h5 class="modal-title">Create New Item</h5>
                 <button type="button" class="btn-close-custom" onclick="closeCreateModal()">✖</button>
@@ -85,13 +85,15 @@
                         <input type="text" name="rarity" class="dark-input" required />
                     </div>
                 </div>
+                
                 <div class="mb-custom">
-                    <label class="form-label-custom">Image URL</label>
-                    <input type="text" name="imagePath" class="dark-input" />
+                    <label class="form-label-custom">Upload Image</label>
+                    <input type="file" name="imageFile" accept="image/*" class="dark-input" style="padding: 7px 14px;" />
                 </div>
+
                 <div class="mb-custom">
                     <label class="form-label-custom">Stats (Comma-separated)</label>
-                    <input type="text" name="statsLinesStr" class="dark-input" />
+                    <input type="text" name="statsLinesStr" class="dark-input" placeholder="e.g. HP +50, ATK +10" />
                 </div>
             </div>
             <div class="modal-footer-dark border-0 pt-0 pb-4 px-4">
@@ -103,13 +105,15 @@
 
 <div class="custom-modal-overlay" id="editModal">
     <div class="custom-modal">
-        <form method="post" asp-page-handler="Update" class="m-0">
+        <form method="post" asp-page-handler="Update" class="m-0" enctype="multipart/form-data">
             <div class="modal-header-dark">
                 <h5 class="modal-title">Edit Item Info</h5>
                 <button type="button" class="btn-close-custom" onclick="closeEditModal()">✖</button>
             </div>
             <div class="modal-body p-4">
                 <input type="hidden" name="id" id="edit_id" />
+                <input type="hidden" name="imagePath" id="edit_imagePath" />
+
                 <div class="mb-custom">
                     <label class="form-label-custom">Item Name</label>
                     <input type="text" name="name" id="edit_name" class="dark-input" required />
@@ -128,10 +132,12 @@
                         <input type="text" name="rarity" id="edit_rarity" class="dark-input" required />
                     </div>
                 </div>
+
                 <div class="mb-custom">
-                    <label class="form-label-custom">Image URL</label>
-                    <input type="text" name="imagePath" id="edit_image" class="dark-input" />
+                    <label class="form-label-custom">Update Image (Leave blank to keep current)</label>
+                    <input type="file" name="imageFile" accept="image/*" class="dark-input" style="padding: 7px 14px;" />
                 </div>
+
                 <div class="mb-custom">
                     <label class="form-label-custom">Stats (Comma-separated)</label>
                     <input type="text" name="statsLinesStr" id="edit_stats" class="dark-input" />
@@ -149,9 +155,12 @@
         function openCreateModal() { document.getElementById('createModal').classList.add('show'); }
         function closeCreateModal() { document.getElementById('createModal').classList.remove('show'); }
         function openEditModal(id, name, desc, type, rarity, image, stats) {
-            document.getElementById('edit_id').value = id; document.getElementById('edit_name').value = name;
-            document.getElementById('edit_description').value = desc; document.getElementById('edit_type').value = type;
-            document.getElementById('edit_rarity').value = rarity; document.getElementById('edit_image').value = image;
+            document.getElementById('edit_id').value = id;
+            document.getElementById('edit_name').value = name;
+            document.getElementById('edit_description').value = desc;
+            document.getElementById('edit_type').value = type;
+            document.getElementById('edit_rarity').value = rarity;
+            document.getElementById('edit_imagePath').value = image; // Gán vào hidden field
             document.getElementById('edit_stats').value = stats;
             document.getElementById('editModal').classList.add('show');
         }
