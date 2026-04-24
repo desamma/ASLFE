@@ -26,6 +26,31 @@
     letter-spacing: -0.5px;
 }
 
+.notification-error {
+    color: #1a1a1a;
+    background: #ffcccc;
+    border: 1px solid #ff6666;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.notification-success {
+    color: #1a1a1a;
+    background: #ccffcc;
+    border: 1px solid #66cc66;
+    padding: 12px 14px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1a1a;
+}
+
 /* Form Styling */
 .news-form {
     display: flex;
@@ -270,6 +295,7 @@ body.modal-open {
 
 /* Image Browser Grid */
 .image-browser-grid {
+    color: black !important;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 16px;
@@ -287,6 +313,11 @@ body.modal-open {
     transition: all 0.3s ease;
     overflow: hidden;
     min-height: 0;
+}
+
+.image-browser-item,
+.image-browser-item * {
+    cursor: pointer;
 }
 
 .image-browser-item:hover {
@@ -307,7 +338,7 @@ body.modal-open {
 
 .image-browser-name {
     font-size: 0.75rem;
-    color: #333;
+    color: black !important;
     text-align: center;
     word-break: break-all;
     font-weight: 500;
@@ -320,6 +351,7 @@ body.modal-open {
 }
 
 .loading-spinner {
+    color: black !important;
     grid-column: 1 / -1;
     text-align: center;
     padding: 40px;

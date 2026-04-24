@@ -32,15 +32,15 @@ function closeImageDialog(event) {
 }
 
 function insertImage() {
-    const imageName = document.getElementById('imageName').value.trim();
+const imageUrl = document.getElementById('imageName').value.trim();
     
-    if (!imageName) {
-        alert('Please enter an image name');
-        return;
-    }
+if (!imageUrl) {
+    alert('Please enter an image URL');
+    return;
+}
     
-    const editor = document.getElementById('ContentEditor');
-    const imageMarker = `[IMAGE:${imageName}]`;
+const editor = document.getElementById('ContentEditor');
+const imageMarker = `[IMAGE:${imageUrl}]`;
     
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
@@ -73,12 +73,29 @@ function closeImageBrowser(event) {
 }
 
 function loadImageBrowser() {
-    const content = document.getElementById('imageBrowserContent');
-    content.innerHTML = '<div class="loading-spinner">Loading images...</div>';
+const content = document.getElementById('imageBrowserContent');
+content.innerHTML = '<div class="loading-spinner">Loading images...</div>';
     
-    fetch('/News/CreateNews?handler=Images')
-        .then(response => response.json())
-        .then(data => {
+const getImagesUrl = window.createNewsPageUrls?.getImages || '/News/CreateNews?handler=GetImages';
+
+fetch(getImagesUrl, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
+    .then(async response => {
+        const body = await response.text();
+        const contentType = response.headers.get('content-type') || '';
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${body}`);
+        }
+
+        if (!contentType.includes('application/json')) {
+            const isSignInPage = /<title>\s*Sign In\s*-\s*FE\s*<\/title>/i.test(body) || /<title>\s*Sign In\s*<\/title>/i.test(body);
+            throw new Error(isSignInPage
+                ? 'Sign in required to browse cloud images.'
+                : `Expected JSON but received ${contentType || 'unknown content type'}: ${body.slice(0, 200)}`);
+        }
+
+        return JSON.parse(body);
+    })
+    .then(data => {
             if (!data.success || !data.images || data.images.length === 0) {
                 content.innerHTML = '<div class="loading-spinner">No images found</div>';
                 return;
@@ -86,25 +103,35 @@ function loadImageBrowser() {
             
             let html = '';
             data.images.forEach(image => {
+                const imageUrl = image.url || image.path || '';
                 html += `
-                    <div class="image-browser-item" onclick="selectImageFromBrowser('${image.name}')">
-                        <img src="${image.path}" alt="${image.name}" class="image-browser-thumbnail" />
-                        <div class="image-browser-name" title="${image.name}">${image.name}</div>
+                    <div class="image-browser-item" role="button" tabindex="0" data-image-url="${escapeHtml(imageUrl)}">
+                        <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(image.name)}" class="image-browser-thumbnail" />
+                        <div class="image-browser-name" title="${escapeHtml(image.name)}">${escapeHtml(image.name)}</div>
                     </div>
                 `;
             });
             
             content.innerHTML = html;
+            content.querySelectorAll('.image-browser-item').forEach(item => {
+                item.addEventListener('click', () => selectImageFromBrowser(item.dataset.imageUrl || ''));
+                item.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        selectImageFromBrowser(item.dataset.imageUrl || '');
+                    }
+                });
+            });
         })
         .catch(error => {
             console.error('Error loading images:', error);
-            content.innerHTML = '<div class="loading-spinner">Error loading images</div>';
+            content.innerHTML = `<div class="loading-spinner">${escapeHtml(error.message || 'Error loading images')}</div>`;
         });
 }
 
-function selectImageFromBrowser(imageName) {
+function selectImageFromBrowser(imageUrl) {
     const editor = document.getElementById('ContentEditor');
-    const imageMarker = `[IMAGE:${imageName}]`;
+    const imageMarker = `[IMAGE:${imageUrl}]`;
     
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
@@ -143,8 +170,8 @@ function updatePreview() {
             // Extract image name
             const imageMatch = trimmedLine.match(/\[IMAGE:(.*?)\]/);
             if (imageMatch && imageMatch[1]) {
-                const imageName = imageMatch[1];
-                previewHTML += `<img src="/images/${imageName}" alt="News Image" style="max-width: 100%; height: auto; margin: 12px 0; border-radius: 6px;" onerror="this.style.display='none';" />`;
+                const imageUrl = resolveNewsImageUrl(imageMatch[1]);
+                previewHTML += `<img src="${imageUrl}" alt="News Image" style="max-width: 100%; height: auto; margin: 12px 0; border-radius: 6px;" onerror="this.style.display='none';" />`;
             }
         } else if (trimmedLine.length > 0) {
             // Regular text
@@ -153,6 +180,22 @@ function updatePreview() {
             // Preserve empty lines as spacing
             previewHTML += '<br />';
         }
+
+function resolveNewsImageUrl(imageValue) {
+    if (!imageValue) return '';
+
+    if (/^https?:\/\//i.test(imageValue)) {
+        return imageValue;
+    }
+
+    const bucket = window.createNewsPageUrls?.firebaseBucket;
+    if (bucket) {
+        const normalizedPath = imageValue.replace(/^[\\/]+/, '').replace(/^News\//i, '');
+        return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(normalizedPath)}?alt=media`;
+    }
+
+    return imageValue;
+}
     });
     
     preview.innerHTML = previewHTML || '<p style="color: #999;">Preview will appear here...</p>';
