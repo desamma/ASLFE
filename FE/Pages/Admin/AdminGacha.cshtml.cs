@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Text;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace FE.Pages.Admin
@@ -16,7 +16,7 @@ namespace FE.Pages.Admin
             _httpClientFactory = httpClientFactory;
         }
 
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = string.Empty;
         public List<GachaItemDto> Items { get; set; } = new List<GachaItemDto>();
 
         public async Task OnGetAsync()
@@ -44,48 +44,65 @@ namespace FE.Pages.Admin
             }
         }
 
-        public async Task<IActionResult> OnPostCreateAsync(string name, string description, string type, string rarity, string imagePath, string statsLinesStr)
+        public async Task<IActionResult> OnPostCreateAsync(string name, string description, string type, string rarity, IFormFile imageFile, string statsLinesStr)
         {
             var client = _httpClientFactory.CreateClient("Api");
-            var statsList = string.IsNullOrWhiteSpace(statsLinesStr)
-                ? new List<string>()
-                : statsLinesStr.Split(',').Select(s => s.Trim()).ToList();
+            using var formContent = new MultipartFormDataContent();
 
-            var requestBody = new
+            formContent.Add(new StringContent(name ?? ""), "Name");
+            formContent.Add(new StringContent(description ?? ""), "Description");
+            formContent.Add(new StringContent(type ?? ""), "Type");
+            formContent.Add(new StringContent(rarity ?? ""), "Rarity");
+
+            if (!string.IsNullOrWhiteSpace(statsLinesStr))
             {
-                Name = name,
-                Description = description,
-                Type = type,
-                Rarity = rarity,
-                ImagePath = imagePath,
-                StatsLines = statsList
-            };
+                var statsList = statsLinesStr.Split(',').Select(s => s.Trim()).ToList();
+                foreach (var stat in statsList)
+                {
+                    formContent.Add(new StringContent(stat), "StatsLines");
+                }
+            }
 
-            var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
-            var response = await client.PostAsync("api/admin/gacha/items", content);
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var streamContent = new StreamContent(imageFile.OpenReadStream());
+                streamContent.Headers.ContentType = new MediaTypeHeaderValue(imageFile.ContentType);
+                formContent.Add(streamContent, "ImageFile", imageFile.FileName);
+            }
+
+            var response = await client.PostAsync("api/admin/gacha/items", formContent);
 
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnPostUpdateAsync(Guid id, string name, string description, string type, string rarity, string imagePath, string statsLinesStr)
+        public async Task<IActionResult> OnPostUpdateAsync(Guid id, string name, string description, string type, string rarity, string imagePath, IFormFile imageFile, string statsLinesStr)
         {
             var client = _httpClientFactory.CreateClient("Api");
-            var statsList = string.IsNullOrWhiteSpace(statsLinesStr)
-                ? new List<string>()
-                : statsLinesStr.Split(',').Select(s => s.Trim()).ToList();
+            using var formContent = new MultipartFormDataContent();
 
-            var requestBody = new
+            formContent.Add(new StringContent(name ?? ""), "Name");
+            formContent.Add(new StringContent(description ?? ""), "Description");
+            formContent.Add(new StringContent(type ?? ""), "Type");
+            formContent.Add(new StringContent(rarity ?? ""), "Rarity");
+            formContent.Add(new StringContent(imagePath ?? ""), "ImagePath");
+
+            if (!string.IsNullOrWhiteSpace(statsLinesStr))
             {
-                Name = name,
-                Description = description,
-                Type = type,
-                Rarity = rarity,
-                ImagePath = imagePath,
-                StatsLines = statsList
-            };
+                var statsList = statsLinesStr.Split(',').Select(s => s.Trim()).ToList();
+                foreach (var stat in statsList)
+                {
+                    formContent.Add(new StringContent(stat), "StatsLines");
+                }
+            }
 
-            var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
-            var response = await client.PutAsync($"api/admin/gacha/items/{id}", content);
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var streamContent = new StreamContent(imageFile.OpenReadStream());
+                streamContent.Headers.ContentType = new MediaTypeHeaderValue(imageFile.ContentType);
+                formContent.Add(streamContent, "ImageFile", imageFile.FileName);
+            }
+
+            var response = await client.PutAsync($"api/admin/gacha/items/{id}", formContent);
 
             return RedirectToPage();
         }
@@ -94,11 +111,13 @@ namespace FE.Pages.Admin
     public class GachaItemDto
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Type { get; set; }
-        public string Rarity { get; set; }
-        public string ImagePath { get; set; }
+        // Đã gán string.Empty để fix cảnh báo CS8618
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public string Rarity { get; set; } = string.Empty;
+        public string ImagePath { get; set; } = string.Empty;
         public List<string> StatsLines { get; set; } = new List<string>();
     }
+
 }

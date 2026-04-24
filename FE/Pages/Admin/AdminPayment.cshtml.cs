@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Text.Json;
 
 namespace FE.Pages.Admin
 {
@@ -15,9 +16,24 @@ namespace FE.Pages.Admin
         }
 
         [BindProperty(SupportsGet = true)]
-        public string StatusFilter { get; set; }
+        public string? Tab { get; set; } 
 
-        public string ErrorMessage { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string? StatusFilter { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? OrderCode { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? SearchName { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int? Quantity { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string? ItemType { get; set; }
+
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public List<TransactionDto> Transactions { get; set; } = new List<TransactionDto>();
         public List<ShopPurchaseDto> ShopPurchases { get; set; } = new List<ShopPurchaseDto>();
@@ -28,12 +44,13 @@ namespace FE.Pages.Admin
 
             try
             {
-                // 1. Lấy danh sách nạp tiền PayOS
+                // 1. GHÉP URL VÀ LẤY DANH SÁCH NẠP TIỀN PAYOS
+                var txQueryParams = new List<string>();
+                if (!string.IsNullOrEmpty(StatusFilter)) txQueryParams.Add($"status={Uri.EscapeDataString(StatusFilter)}");
+                if (!string.IsNullOrEmpty(OrderCode)) txQueryParams.Add($"orderCode={Uri.EscapeDataString(OrderCode)}");
+
                 var txUrl = "api/admin/payments/transactions";
-                if (!string.IsNullOrEmpty(StatusFilter))
-                {
-                    txUrl += $"?status={Uri.EscapeDataString(StatusFilter)}";
-                }
+                if (txQueryParams.Any()) txUrl += "?" + string.Join("&", txQueryParams);
 
                 var txResponse = await client.GetAsync(txUrl);
                 if (txResponse.IsSuccessStatusCode)
@@ -42,8 +59,16 @@ namespace FE.Pages.Admin
                     if (result != null && result.Success) Transactions = result.Data ?? new List<TransactionDto>();
                 }
 
-                // 2. Lấy danh sách mua đồ trong Shop
-                var shopResponse = await client.GetAsync("api/admin/payments/shop-purchases");
+                // 2. GHÉP URL VÀ LẤY DANH SÁCH MUA ĐỒ TRONG SHOP
+                var shopQueryParams = new List<string>();
+                if (!string.IsNullOrEmpty(SearchName)) shopQueryParams.Add($"searchName={Uri.EscapeDataString(SearchName)}");
+                if (!string.IsNullOrEmpty(ItemType)) shopQueryParams.Add($"itemType={Uri.EscapeDataString(ItemType)}");
+                if (Quantity.HasValue) shopQueryParams.Add($"quantity={Quantity.Value}");
+
+                var shopUrl = "api/admin/payments/shop-purchases";
+                if (shopQueryParams.Any()) shopUrl += "?" + string.Join("&", shopQueryParams);
+
+                var shopResponse = await client.GetAsync(shopUrl);
                 if (shopResponse.IsSuccessStatusCode)
                 {
                     var result = await shopResponse.Content.ReadFromJsonAsync<ApiResponse<List<ShopPurchaseDto>>>();
@@ -60,20 +85,24 @@ namespace FE.Pages.Admin
     public class TransactionDto
     {
         public long OrderCode { get; set; }
-        public string UserName { get; set; }
-        public string Name { get; set; } // Tên gói
+        public string UserName { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty; // Tên gói
         public int Amount { get; set; } // Tiền nạp (VND)
         public int CurrencyAwarded { get; set; } // VP nhận được
-        public string Status { get; set; }
+        public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
     }
 
     public class ShopPurchaseDto
     {
-        public string UserName { get; set; }
-        public string ShopItemName { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public string ShopItemName { get; set; } = string.Empty;
+
+        // Đã thêm Rarity để khớp với giao diện HTML
+        public string Rarity { get; set; } = string.Empty;
+
         public int Quantity { get; set; }
-        public string PaymentType { get; set; }
+        public string PaymentType { get; set; } = string.Empty;
         public int AmountPaid { get; set; }
         public DateTime PurchaseDate { get; set; }
     }
