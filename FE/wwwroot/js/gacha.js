@@ -46,6 +46,41 @@
         }, duration);
     }
 
+    function getActiveBannerMultiCost() {
+        const activeBanner = allBanners.find(b => b.id === activeBannerId);
+        if (activeBanner && Number.isFinite(Number(activeBanner.costPerMultiPull))) {
+            return Number(activeBanner.costPerMultiPull);
+        }
+
+        const uiCost = Number((costMulti?.innerText || '0').replace(/,/g, ''));
+        return Number.isFinite(uiCost) ? uiCost : 0;
+    }
+
+    async function fetchStatusByBannerId() {
+        if (!activeBannerId) return null;
+
+        const res = await fetch(`${API_BASE}?path=status/${activeBannerId}`, {
+            credentials: 'same-origin'
+        });
+
+        if (!res.ok) {
+            throw new Error("HTTP Error: " + res.status);
+        }
+
+        const json = await res.json();
+        return json.data || json;
+    }
+
+    function updateMultiButtonByStatus(statusData) {
+        if (!btnMulti || !statusData) return;
+
+        const currentGems = Number(statusData.currentGems ?? 0);
+        const multiCost = getActiveBannerMultiCost();
+        const canMultiWish = currentGems >= multiCost;
+
+        btnMulti.disabled = !canMultiWish;
+    }
+
     // ── Build Banner Tabs ────────────────────────────────────────────────────
     function buildBannerTabs(banners) {
         if (!bannerTabsContainer) return;
@@ -69,19 +104,15 @@
         if (activeBannerId === bannerId) return;
         activeBannerId = bannerId;
 
-        // Update tab active state
         document.querySelectorAll('.banner-tab').forEach(tab => {
             tab.classList.toggle('active', tab.dataset.bannerId === bannerId);
         });
 
-        // Find banner data from cache
         const banner = allBanners.find(b => b.id === bannerId);
         if (banner) applyBannerToUI(banner);
 
-        // Reload pity for new banner
         loadGachaStatus();
 
-        // Animate card switch
         const card = document.querySelector('.gacha-horizontal-card');
         if (card) {
             card.style.opacity = '0';
@@ -101,7 +132,6 @@
         if (costSingle) costSingle.innerText = new Intl.NumberFormat('en-US').format(data.costPerSinglePull);
         if (costMulti) costMulti.innerText = new Intl.NumberFormat('en-US').format(data.costPerMultiPull);
 
-        // Background image
         if (bannerDisplay) {
             if (data.bannerImagePath) {
                 bannerDisplay.style.backgroundImage = `url('${data.bannerImagePath}')`;
@@ -110,7 +140,6 @@
             }
         }
 
-        // Video source (if video element exists)
         const videoEl = document.getElementById('banner-video');
         const videoSrc = document.getElementById('banner-video-source');
         if (videoEl && videoSrc) {
@@ -143,7 +172,6 @@
             allBanners = banners;
             buildBannerTabs(banners);
 
-            // Auto-select first banner
             activeBannerId = banners[0].id;
             applyBannerToUI(banners[0]);
             loadGachaStatus();
@@ -158,17 +186,13 @@
     async function loadGachaStatus() {
         if (!activeBannerId) return;
         try {
-            const res = await fetch(`${API_BASE}?path=status/${activeBannerId}`, {
-                credentials: 'same-origin'
-            });
-            if (!res.ok) return;
-            const json = await res.json();
-            const data = json.data || json;
+            const data = await fetchStatusByBannerId();
+            if (!data) return;
 
-            if (json.success || data) {
-                if (pityText) pityText.innerText = data.pullsUntilGuaranteed5Star;
-                if (vpDisplay) vpDisplay.innerText = new Intl.NumberFormat('en-US').format(data.currentGems);
-            }
+            if (pityText) pityText.innerText = data.pullsUntilGuaranteed5Star;
+            if (vpDisplay) vpDisplay.innerText = new Intl.NumberFormat('en-US').format(data.currentGems ?? 0);
+
+            updateMultiButtonByStatus(data);
         } catch (err) {
             console.error("Error fetching status:", err);
         }
@@ -180,6 +204,35 @@
             showToast("No banner selected.", 'error');
             return;
         }
+
+        // BẮT BUỘC: Trước khi wish phải kiểm tra lại status theo banner
+        let latestStatus = null;
+        try {
+            latestStatus = await fetchStatusByBannerId();
+
+            if (vpDisplay && latestStatus) {
+                vpDisplay.innerText = new Intl.NumberFormat('en-US').format(latestStatus.currentGems ?? 0);
+            }
+            if (pityText && latestStatus) {
+                pityText.innerText = latestStatus.pullsUntilGuaranteed5Star ?? '--';
+            }
+
+            if (isMulti && latestStatus) {
+                const currentGems = Number(latestStatus.currentGems ?? 0);
+                const multiCost = getActiveBannerMultiCost();
+
+                if (currentGems < multiCost) {
+                    if (btnMulti) btnMulti.disabled = true;
+                    showToast("Không đủ Gems", 'error');
+                    return;
+                }
+            }
+        } catch (error) {
+            console.error("Pre-check status error:", error);
+            showToast("Không thể kiểm tra Gems. Vui lòng thử lại.", 'error');
+            return;
+        }
+
         const endpointPath = isMulti ? 'wish/multi' : 'wish/single';
 
         if (btnSingle) btnSingle.disabled = true;
@@ -206,7 +259,6 @@
                 const data = result.data || result;
                 renderResults(data.results);
                 if (resultModal) resultModal.style.display = 'flex';
-                loadGachaStatus();
             } else {
                 showToast(result.message || result.error || "Wish failed. Insufficient funds.", 'error');
             }
@@ -216,7 +268,7 @@
             showToast("Server connection error! Please try again.", 'error');
         } finally {
             if (btnSingle) btnSingle.disabled = false;
-            if (btnMulti) btnMulti.disabled = false;
+            await loadGachaStatus();
         }
     }
 
