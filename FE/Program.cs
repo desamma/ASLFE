@@ -27,7 +27,7 @@ builder.Services.AddTransient<JwtSessionHandler>();
 
 builder.Services.AddHttpClient("Api", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7206/");
+    client.BaseAddress = new Uri("https://aslbe-apapajdug3ege4cm.eastasia-01.azurewebsites.net/");
     client.DefaultRequestHeaders.Accept.Add(
         new MediaTypeWithQualityHeaderValue("application/json"));
 })
