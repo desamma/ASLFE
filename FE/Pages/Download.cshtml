@@ -1,0 +1,37 @@
+@page
+@model FE.Pages.DownloadModel
+@{
+    ViewData["Title"] = "Download";
+}
+
+<div class="download-page">
+    <div class="download-card">
+        <h1>Download Ashen Light RPG</h1>
+        <p class="download-subtitle">Get the latest game client package.</p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+        {
+            <div class="download-alert">@Model.ErrorMessage</div>
+        }
+
+        <div class="download-meta">
+            <p><strong>File:</strong> <code>ashenLightRPG.zip</code></p>
+            @if (Model.IsFileAvailable)
+            {
+                <p><strong>Source:</strong> Cloud storage</p>
+            }
+            else
+            {
+                <p class="missing-file">File is currently not available in cloud storage.</p>
+            }
+        </div>
+
+        <form method="post" asp-page-handler="Download">
+            <button type="submit" class="download-button" @(Model.IsFileAvailable ? null : "disabled")>
+                Download ashenLightRPG.zip
+            </button>
+        </form>
+
+        <a href="/" class="back-link">Back to Home</a>
+    </div>
+</div>
