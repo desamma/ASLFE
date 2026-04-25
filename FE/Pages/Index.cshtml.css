@@ -337,34 +337,6 @@
         display: block;
     }
 
-.map-legend {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 20px;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    font-size: 0.9rem;
-}
-
-    .legend-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .legend-item .icon {
-        width: 20px;
-        height: 20px;
-        margin-right: 10px;
-        color: #ff6b35;
-    }
-
 .feature-cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -564,11 +536,6 @@
     .game-categories {
         grid-template-columns: 1fr;
         gap: 40px;
-    }
-
-    .map-legend {
-        position: static;
-        margin-top: 20px;
     }
 
     /* Header Mobile */

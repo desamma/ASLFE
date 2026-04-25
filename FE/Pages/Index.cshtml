@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="hero-image">
-            <img src="/images/hero-mask.png" alt="Monster Hunter Mask" />
+            <img src="@Model.ResolveImageUrl("images/hero-mask.png")" alt="Monster Hunter Mask" />
         </div>
     </section>
 
@@ -41,7 +41,7 @@
                 </p>
             </div>
             <div class="intro-image">
-                <img src="/images/deviljho.jpg" alt="Game Screenshot" />
+                <img src="@Model.ResolveImageUrl("images/deviljho.jpg")" alt="Game Screenshot" />
             </div>
         </div>
     </section>
@@ -56,36 +56,16 @@
 
         <div class="explore-content">
             <div class="world-map">
-                <img src="/images/world-map.png" alt="World of Monster Hunter" />
-                <div class="map-legend">
-                    <div class="legend-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
-                        </svg>
-                        <span>Settlement</span>
-                    </div>
-                    <div class="legend-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
-                        </svg>
-                        <span>Hunting Ground</span>
-                    </div>
-                    <div class="legend-item">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
-                        </svg>
-                        <span>Monster Lairs</span>
-                    </div>
-                </div>
+                <img src="@Model.ResolveImageUrl("images/FullMap.png")" alt="World of Monster Hunter" />
             </div>
 
             <div class="feature-cards">
                 <div class="feature-card">
-                    <img src="/images/eldenringmaiden.png" alt="Companion" />
+                    <img src="@Model.ResolveImageUrl("images/eldenringmaiden.png")" alt="Companion" />
                     <p>Glean to your companions</p>
                 </div>
                 <div class="feature-card">
-                    <img src="/images/rathalos.jpg" alt="Monster" />
+                    <img src="@Model.ResolveImageUrl("images/rathalos.jpg")" alt="Monster" />
                     <p>And hunt dangerous monsters</p>
                 </div>
             </div>
