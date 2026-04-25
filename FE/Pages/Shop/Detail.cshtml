@@ -132,8 +132,8 @@
 
                     <!-- Purchase Action -->
                     <div class="purchase-section">
-                        <button class="btn-purchase-detail @(Model.ShopItem.IsUsingPremiumCurrency ? "" : "btn-purchase-detail-primary")" 
-                                onclick="purchaseItemDetail('@Model.ShopItem.Id')" 
+                        <button class="btn-purchase-detail @(Model.ShopItem.IsUsingPremiumCurrency ? "" : "btn-purchase-detail-primary")"
+                                onclick="purchaseItemDetail('@Model.ShopItem.Id', this)"
                                 type="button">
                             <span>@(Model.ShopItem.IsUsingPremiumCurrency ? "Purchase with Gems" : "Buy Now")</span>
                         </button>
@@ -181,5 +181,9 @@
 </div>
 
 @section Scripts {
+    @Html.AntiForgeryToken()
+    <script>
+        window.shopBuyUrl = '@Url.Page("/Shop/Detail", "Buy", new { id = Model.ShopItem?.Id })';
+    </script>
     <script src="~/js/shop-detail.js"></script>
 }
