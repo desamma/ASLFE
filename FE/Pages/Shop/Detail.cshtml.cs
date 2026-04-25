@@ -63,6 +63,8 @@ namespace FE.Pages.Shop
             }
         }
 
+       
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> OnPostBuyAsync([FromBody] BuyShopItemRequest request)
         {
             if (!ModelState.IsValid)
@@ -70,11 +72,16 @@ namespace FE.Pages.Shop
                 return BadRequest(new { message = "Invalid request", errors = ModelState });
             }
 
+            // FIX 3: Kiểm tra request null (có thể xảy ra nếu Content-Type sai)
+            if (request == null)
+            {
+                return BadRequest(new { message = "Request body is missing or malformed." });
+            }
+
             try
             {
                 var client = _httpClientFactory.CreateClient("Api");
 
-                // Gọi thẳng backend API, không qua proxy
                 var response = await client.PostAsJsonAsync("api/shop/buy", request);
                 var content = await response.Content.ReadAsStringAsync();
 
