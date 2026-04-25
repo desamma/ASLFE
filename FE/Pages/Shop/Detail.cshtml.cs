@@ -84,7 +84,7 @@ namespace FE.Pages.Shop
             {
                 var client = _httpClientFactory.CreateClient("Api");
 
-                var response = await client.PostAsJsonAsync("api/shop/buy", request);
+                var response = await client.PostAsJsonAsync("api/shoppurchase/buy", request);
                 var content = await response.Content.ReadAsStringAsync();
 
                 return new ContentResult
