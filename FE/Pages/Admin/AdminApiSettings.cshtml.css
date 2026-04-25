@@ -1,0 +1,176 @@
+﻿/* --- TABLE STYLING --- */
+.admin-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 10px;
+}
+
+    .admin-table th {
+        background-color: #25252d;
+        color: #9ca3af;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 15px;
+        border-bottom: 1px solid #444;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .admin-table td {
+        padding: 15px;
+        border-bottom: 1px solid #2d2d35;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .admin-table tbody tr:hover td {
+        background-color: #282833;
+    }
+
+/* --- ACTION BUTTONS --- */
+.action-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+/* =========================================
+   --- PREMIUM MODAL STYLING (THE FIX) --- 
+   ========================================= */
+
+/* THIS IS WHAT HIDES THE MODAL AND MAKES IT FLOAT */
+.custom-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+    /* Javascript adds this class to make it visible */
+    .custom-modal-overlay.show {
+        display: flex;
+    }
+
+.custom-modal {
+    background-color: #121214;
+    border: 1px solid #27272a;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    transform: translateY(20px);
+    animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes modalFadeIn {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header-dark {
+    background-color: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 24px 24px 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.btn-close-custom {
+    background: #1f1f22;
+    border: 1px solid #333;
+    color: #a1a1aa;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+    .btn-close-custom:hover {
+        background: #27272a;
+        color: #fff;
+        transform: rotate(90deg);
+    }
+
+/* --- PREMIUM INPUTS --- */
+.dark-input {
+    background-color: #09090b;
+    border: 1px solid #27272a;
+    color: #f4f4f5;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+    .dark-input:focus {
+        outline: none;
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15), inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .dark-input::placeholder {
+        color: #52525b;
+    }
+
+/* --- MODAL FOOTER & BUTTON --- */
+.modal-footer-dark {
+    background-color: transparent;
+    border-top: none;
+    padding: 0 24px 24px 24px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.btn-save-modal {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+    .btn-save-modal:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+    }
