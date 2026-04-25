@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BussinessObjects.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using BussinessObjects.Models;
 using System.Text.Json;
-using System.Net.Http.Json;
 
 namespace FE.Pages.Shop
 {
@@ -10,7 +9,8 @@ namespace FE.Pages.Shop
     {
         private readonly ILogger<DetailModel> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
-
+        private const string FirebasePrefix = "https://firebasestorage.googleapis.com/";
+        private const string ItemPathSegment = "images%2Fitems%2F";
         public DetailModel(ILogger<DetailModel> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
@@ -52,6 +52,8 @@ namespace FE.Pages.Shop
                     ErrorMessage = "Shop item not found or is no longer available.";
                     return NotFound();
                 }
+
+                ShopItem.ImagePath = Normalize(ShopItem.ImagePath);
 
                 return Page();
             }
@@ -103,6 +105,32 @@ namespace FE.Pages.Shop
         {
             public Guid ShopItemId { get; set; }
             public int Quantity { get; set; } = 1;
+        }
+        private static string Normalize(string? imagePath)
+        {
+            if (string.IsNullOrWhiteSpace(imagePath) ||
+                !imagePath.StartsWith(FirebasePrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return imagePath ?? string.Empty;
+            }
+
+            var queryIndex = imagePath.IndexOf('?', StringComparison.Ordinal);
+            if (queryIndex < 0)
+            {
+                return imagePath;
+            }
+
+            var basePath = imagePath[..queryIndex];
+            if (!basePath.Contains(ItemPathSegment, StringComparison.OrdinalIgnoreCase) ||
+                basePath.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                basePath.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                basePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                basePath.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
+            {
+                return imagePath;
+            }
+
+            return $"{basePath}.jpg{imagePath[queryIndex..]}";
         }
     }
 }
