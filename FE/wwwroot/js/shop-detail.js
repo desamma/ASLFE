@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     loadRelatedItems();
 });
 
@@ -43,15 +43,21 @@ window.purchaseItemDetail = async (itemId, buttonEl) => {
         return;
     }
 
-    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+   
+    const tokenInput = document.querySelector('#af-form input[name="__RequestVerificationToken"]');
+    const token = tokenInput ? tokenInput.value : '';
 
     try {
-        if (buttonEl) buttonEl.disabled = true;
+        if (buttonEl) {
+            buttonEl.disabled = true;
+            buttonEl.innerHTML = '<span>Processing...</span>';
+        }
 
         const response = await fetch(buyUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                // FIX: Đúng tên header mà ASP.NET Core AntiForgery middleware đọc
                 'RequestVerificationToken': token
             },
             credentials: 'same-origin',
@@ -68,11 +74,18 @@ window.purchaseItemDetail = async (itemId, buttonEl) => {
             return;
         }
 
-        showMessage(json.message || 'Purchase successful.', 'success');
+        showMessage(json.message || 'Purchase successful!', 'success');
+
     } catch (error) {
         console.error('Purchase error:', error);
         showMessage('Cannot connect to server.', 'error');
     } finally {
-        if (buttonEl) buttonEl.disabled = false;
+        if (buttonEl) {
+            buttonEl.disabled = false;
+            // Khôi phục lại text gốc của button
+            const isGem = buttonEl.classList.contains('btn-purchase-detail') &&
+                !buttonEl.classList.contains('btn-purchase-detail-primary');
+            buttonEl.innerHTML = `<span>${isGem ? 'Purchase with Gems' : 'Buy Now'}</span>`;
+        }
     }
 };

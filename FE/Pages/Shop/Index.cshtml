@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model ShopIndexModel
 @{
     ViewData["Title"] = "Web Store";
@@ -46,7 +46,7 @@
                     <span class="tab-icon">
                         @if (category == "Currency")
                         {
-                            <img src="/images/virtual-currency.png" width="32" height="32" alt="currency" />
+                            <img src="https://firebasestorage.googleapis.com/v0/b/ashen-light-rpg.firebasestorage.app/o/images%2Fvirtual-currency.png?alt=media" width="32" height="32" alt="currency" />
                         }
                         else if (category == "Item")
                         {
@@ -90,7 +90,7 @@
                     <span class="heading-icon">
                         @if (category == "Currency")
                         {
-                            <img src="/images/virtual-currency.png" width="32" height="32" alt="currency" />
+                            <img src="https://firebasestorage.googleapis.com/v0/b/ashen-light-rpg.firebasestorage.app/o/images%2Fvirtual-currency.png?alt=media" width="32" height="32" alt="currency" />
                         }
                         else if (category == "Item")
                         {
@@ -131,7 +131,7 @@
                                 {
                                     <p class="item-reward">
                                         <span class="reward-icon">+</span> @item.CurrencyAmount.Value.ToString("N0")
-                                        <img src="/images/virtual-currency.png" width="24" height="24" alt="gem" />
+                                        <img src="https://firebasestorage.googleapis.com/v0/b/ashen-light-rpg.firebasestorage.app/o/images%2Fvirtual-currency.png?alt=media" width="24" height="24" alt="gem" />
                                     </p>
                                 }
                                 @if (item.ItemQuantity.HasValue && item.ItemQuantity > 1)
@@ -146,7 +146,7 @@
                                         <span class="price @(item.IsUsingPremiumCurrency ? "premium-currency" : "regular-currency")">
                                             @if (item.IsUsingPremiumCurrency)
                                             {
-                                                <img src="/images/virtual-currency.png" width="20" height="20" alt="gem" />
+                                                <img src="https://firebasestorage.googleapis.com/v0/b/ashen-light-rpg.firebasestorage.app/o/images%2Fvirtual-currency.png?alt=media" width="20" height="20" alt="gem" />
                                             }
                                             else
                                             {
