@@ -1,7 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using BussinessObjects.Models;
 using System.Text.Json;
+using System.Net.Http.Json;
 
 namespace FE.Pages.Shop
 {
@@ -40,7 +41,6 @@ namespace FE.Pages.Shop
                 var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 var content = await response.Content.ReadAsStringAsync();
 
-                // Deserialize the response which has { message: "...", data: {...} } structure
                 var jsonElement = JsonSerializer.Deserialize<JsonElement>(content, jsonOptions);
                 if (jsonElement.ValueKind == JsonValueKind.Object && jsonElement.TryGetProperty("data", out var dataProperty))
                 {
@@ -61,6 +61,41 @@ namespace FE.Pages.Shop
                 ErrorMessage = "An error occurred while loading shop item details.";
                 return NotFound();
             }
+        }
+
+        public async Task<IActionResult> OnPostBuyAsync([FromBody] BuyShopItemRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid request", errors = ModelState });
+            }
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("Api");
+
+                // Gọi thẳng backend API, không qua proxy
+                var response = await client.PostAsJsonAsync("api/shop/buy", request);
+                var content = await response.Content.ReadAsStringAsync();
+
+                return new ContentResult
+                {
+                    Content = content,
+                    ContentType = "application/json",
+                    StatusCode = (int)response.StatusCode
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while buying shop item");
+                return StatusCode(500, new { message = "Internal server error while processing purchase." });
+            }
+        }
+
+        public class BuyShopItemRequest
+        {
+            public Guid ShopItemId { get; set; }
+            public int Quantity { get; set; } = 1;
         }
     }
 }
