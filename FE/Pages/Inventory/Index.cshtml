@@ -48,6 +48,21 @@
                             <path d="m21 21-4.35-4.35"></path>
                         </svg>
                     </div>
+
+                    <div class="sort-box">
+                        <label for="inventorySort" class="sort-label">Sort by</label>
+                        <select id="inventorySort" class="sort-select">
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="name-asc">Name: A to Z</option>
+                            <option value="name-desc">Name: Z to A</option>
+                            <option value="quantity-desc">Quantity: High to Low</option>
+                            <option value="quantity-asc">Quantity: Low to High</option>
+                            <option value="rarity-desc">Rarity: High to Low</option>
+                            <option value="rarity-asc">Rarity: Low to High</option>
+                        </select>
+                    </div>
+
                     <div class="filter-buttons">
                         <button class="filter-btn active" data-filter="all">All</button>
                         <button class="filter-btn" data-filter="weapon">Weapon</button>
@@ -63,7 +78,13 @@
                 <div class="inventory-grid" id="inventoryGrid">
                     @foreach (var item in Model.UserItems)
                     {
-                        <div class="inventory-item" data-item-id="@item.ItemId" data-item-type="@item.Type.ToLower()" data-item-name="@item.Name.ToLower()">
+                        <div class="inventory-item"
+                             data-item-id="@item.ItemId"
+                             data-item-type="@item.Type.ToLower()"
+                             data-item-name="@item.Name.ToLower()"
+                             data-item-rarity="@item.Rarity.ToLower()"
+                             data-item-quantity="@item.Quantity"
+                             data-item-created-at="@($"{item.CreatedAt:O}")">
                             <div class="item-card">
                                 <!-- Item Image -->
                                 <div class="item-image-wrapper">
