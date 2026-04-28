@@ -129,6 +129,34 @@
     gap: 1.5rem;
 }
 
+.sort-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.sort-label {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.sort-select {
+    min-width: 220px;
+    padding: 0.75rem 1rem;
+    border: 2px solid #CCCCCC;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.sort-select:focus {
+    outline: none;
+    border-color: #2C3E50;
+    box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+}
+
 .search-box {
     position: relative;
     display: flex;
@@ -186,6 +214,18 @@
     background: #2C3E50;
     border-color: #2C3E50;
     color: white;
+}
+
+@media (max-width: 576px) {
+    .sort-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sort-select {
+        width: 100%;
+        min-width: 0;
+    }
 }
 
 /* Grid Section */
