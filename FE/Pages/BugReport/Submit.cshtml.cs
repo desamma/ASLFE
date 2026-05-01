@@ -37,12 +37,12 @@ namespace FE.Pages.BugReport
 
                 var bugReportRequest = new
                 {
-                    title = Input.Title,
-                    description = Input.Description,
-                    steps = Input.Steps,
-                    expectedBehavior = Input.ExpectedBehavior,
-                    actualBehavior = Input.ActualBehavior,
-                    severity = Input.Severity ?? "Medium"
+                    Title = Input.Title.Trim(),
+                    Description = Input.Description.Trim(),
+                    Steps = string.IsNullOrWhiteSpace(Input.Steps) ? null : Input.Steps.Trim(),
+                    ExpectedBehavior = string.IsNullOrWhiteSpace(Input.ExpectedBehavior) ? null : Input.ExpectedBehavior.Trim(),
+                    ActualBehavior = string.Empty,
+                    Severity = string.IsNullOrWhiteSpace(Input.Severity) ? "Medium" : Input.Severity.Trim()
                 };
 
                 var response = await client.PostAsJsonAsync("api/bugreport/submit", bugReportRequest);
@@ -51,28 +51,12 @@ namespace FE.Pages.BugReport
                 {
                     SuccessMessage = "Bug report submitted successfully!";
                     Input = new InputModel();
+                    // Success message will be cleared by JavaScript after 4 seconds
                     return Page();
                 }
 
                 var errorContent = await response.Content.ReadAsStringAsync();
-                var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                
-                try
-                {
-                    var errorResponse = JsonSerializer.Deserialize<JsonElement>(errorContent, jsonOptions);
-                    if (errorResponse.ValueKind == JsonValueKind.Object && errorResponse.TryGetProperty("message", out var messageProperty))
-                    {
-                        ErrorMessage = messageProperty.GetString() ?? "Failed to submit bug report";
-                    }
-                    else
-                    {
-                        ErrorMessage = "Failed to submit bug report. Please try again.";
-                    }
-                }
-                catch
-                {
-                    ErrorMessage = "Failed to submit bug report. Please try again.";
-                }
+                ErrorMessage = ExtractErrorMessage(errorContent);
 
                 return Page();
             }
@@ -81,6 +65,66 @@ namespace FE.Pages.BugReport
                 ErrorMessage = $"An error occurred: {ex.Message}";
                 return Page();
             }
+        }
+
+        private static string ExtractErrorMessage(string responseContent)
+        {
+            if (string.IsNullOrWhiteSpace(responseContent))
+                return "Failed to submit bug report. Please try again.";
+
+            try
+            {
+                var jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, jsonOptions);
+
+                if (errorResponse.ValueKind != JsonValueKind.Object)
+                    return "Failed to submit bug report. Please try again.";
+
+                if (errorResponse.TryGetProperty("message", out var messageProperty))
+                {
+                    var message = messageProperty.GetString();
+                    if (!string.IsNullOrWhiteSpace(message))
+                        return message;
+                }
+
+                if (errorResponse.TryGetProperty("errors", out var errorsProperty))
+                {
+                    if (errorsProperty.ValueKind == JsonValueKind.Array)
+                    {
+                        var messages = errorsProperty
+                            .EnumerateArray()
+                            .Select(error => error.GetString())
+                            .Where(message => !string.IsNullOrWhiteSpace(message))
+                            .Take(3)
+                            .ToList();
+
+                        if (messages.Count > 0)
+                            return string.Join(" ", messages!);
+                    }
+                    else if (errorsProperty.ValueKind == JsonValueKind.Object)
+                    {
+                        var messages = new List<string>();
+
+                        foreach (var property in errorsProperty.EnumerateObject())
+                        {
+                            if (property.Value.ValueKind == JsonValueKind.Array)
+                            {
+                                messages.AddRange(property.Value.EnumerateArray()
+                                    .Select(error => error.GetString())
+                                    .Where(message => !string.IsNullOrWhiteSpace(message)));
+                            }
+                        }
+
+                        if (messages.Count > 0)
+                            return string.Join(" ", messages.Take(3));
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return "Failed to submit bug report. Please try again.";
         }
 
         public class InputModel
@@ -98,9 +142,6 @@ namespace FE.Pages.BugReport
 
             [MaxLength(200, ErrorMessage = "Expected behavior cannot exceed 200 characters")]
             public string? ExpectedBehavior { get; set; }
-
-            [MaxLength(200, ErrorMessage = "Actual behavior cannot exceed 200 characters")]
-            public string? ActualBehavior { get; set; }
 
             [MaxLength(50, ErrorMessage = "Severity cannot exceed 50 characters")]
             public string? Severity { get; set; }

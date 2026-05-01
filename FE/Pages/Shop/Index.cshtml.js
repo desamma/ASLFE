@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     const tabs = document.querySelectorAll('.category-tab');
     const categories = document.querySelectorAll('.shop-category');
 

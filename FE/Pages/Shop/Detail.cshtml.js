@@ -43,7 +43,7 @@ window.purchaseItemDetail = async (itemId, buttonEl) => {
         return;
     }
 
-   
+
     const tokenInput = document.querySelector('#af-form input[name="__RequestVerificationToken"]');
     const token = tokenInput ? tokenInput.value : '';
 
