@@ -41,8 +41,5 @@ namespace BussinessObjects.Models
 
         [DataType(DataType.DateTime)]
         public DateTime? UpdatedDate { get; set; }
-
-        [MaxLength(500)]
-        public string AdminNotes { get; set; }
     }
 }

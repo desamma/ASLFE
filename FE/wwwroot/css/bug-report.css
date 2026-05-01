@@ -337,7 +337,20 @@
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 20px;
+    color: rgba(231, 76, 60, 0.9);
+    display: none;
 }
+
+    .validation-summary.show {
+        display: block;
+    }
+
+    .validation-summary[role="status"] {
+        background: rgba(46, 204, 113, 0.1);
+        border: 1px solid rgba(46, 204, 113, 0.3);
+        border-left: 3px solid var(--success);
+        color: rgba(46, 204, 113, 0.9);
+    }
 
     .validation-summary ul {
         list-style: none;
@@ -346,10 +359,14 @@
     }
 
     .validation-summary li {
-        color: rgba(231, 76, 60, 0.9);
+        color: inherit;
         font-size: 13px;
         line-height: 1.6;
         margin: 4px 0;
+    }
+
+    .validation-summary[role="status"] li {
+        color: rgba(46, 204, 113, 0.9);
     }
 
 .modal-overlay {

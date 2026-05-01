@@ -4,8 +4,6 @@
     ViewData["Title"] = "Submit Bug Report";
 }
 
-<link rel="stylesheet" href="~/css/bug-report.css" />
-
 <div class="bug-report-container">
     <div class="bug-report-wrapper">
         <!-- Header -->
@@ -22,6 +20,14 @@
 
         <!-- Form Card -->
         <div class="bug-report-card">
+            <div class="validation-summary @(!string.IsNullOrWhiteSpace(Model.ErrorMessage) ? "show" : "")" role="alert">
+                @Model.ErrorMessage
+            </div>
+
+            <div class="validation-summary @(!string.IsNullOrWhiteSpace(Model.SuccessMessage) ? "show" : "")" role="status">
+                @Model.SuccessMessage
+            </div>
+
             <form method="post" class="bug-report-form">
                 <!-- Validation Summary -->
                 <div asp-validation-summary="All" class="validation-summary" style="display: none;"></div>
@@ -127,135 +133,16 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        let notificationAction = null;
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const successMsg = document.querySelector('.validation-summary[role="status"]');
 
-        function showNotification(title, message, type, actionCallback = null) {
-            const modal = document.getElementById('notificationModal');
-            const titleElem = document.getElementById('notificationTitle');
-            const contentElem = document.getElementById('notificationContent');
-            const btnElem = document.getElementById('notificationBtn');
-
-            titleElem.textContent = title;
-            contentElem.innerHTML = `<div class="notification-${type}">${escapeHtml(message)}</div>`;
-
-            // Add type-specific styling
-            if (type === 'success') {
-                btnElem.className = 'btn-primary btn-success';
-            } else if (type === 'error') {
-                btnElem.className = 'btn-primary btn-danger';
-            } else {
-                btnElem.className = 'btn-primary';
-            }
-
-            notificationAction = actionCallback;
-            modal.classList.add('active');
-            btnElem.focus();
-        }
-
-        function closeNotificationModal(event) {
-            if (event && event.target.id !== 'notificationModal') return;
-            document.getElementById('notificationModal').classList.remove('active');
-            notificationAction = null;
-        }
-
-        function handleNotificationAction() {
-            closeNotificationModal();
-            if (notificationAction && typeof notificationAction === 'function') {
-                notificationAction();
-            }
-        }
-
-        function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const titleInput = document.querySelector('[asp-for="Input.Title"]');
-            const descriptionInput = document.querySelector('[asp-for="Input.Description"]');
-            const stepsInput = document.querySelector('[asp-for="Input.Steps"]');
-            const expectedInput = document.querySelector('[asp-for="Input.ExpectedBehavior"]');
-            const validationSummary = document.querySelector('.validation-summary');
-
-            // Show validation summary if there are errors
-            if (validationSummary && validationSummary.querySelector('ul li')) {
-                validationSummary.style.display = 'block';
-            }
-
-            // Character counter for title
-            if (titleInput) {
-                titleInput.addEventListener('input', function () {
-                    document.getElementById('titleCount').textContent = this.value.length;
-                });
-            }
-
-            // Character counter for description
-            if (descriptionInput) {
-                descriptionInput.addEventListener('input', function () {
-                    document.getElementById('descriptionCount').textContent = this.value.length;
-                });
-            }
-
-            // Character counter for steps
-            if (stepsInput) {
-                stepsInput.addEventListener('input', function () {
-                    document.getElementById('stepsCount').textContent = this.value.length;
-                });
-            }
-
-            // Character counter for expected
-            if (expectedInput) {
-                expectedInput.addEventListener('input', function () {
-                    document.getElementById('expectedCount').textContent = this.value.length;
-                });
-            }
-
-            // Initial character counts
-            if (titleInput) {
-                document.getElementById('titleCount').textContent = titleInput.value.length;
-            }
-            if (descriptionInput) {
-                document.getElementById('descriptionCount').textContent = descriptionInput.value.length;
-            }
-            if (stepsInput) {
-                document.getElementById('stepsCount').textContent = stepsInput.value.length;
-            }
-            if (expectedInput) {
-                document.getElementById('expectedCount').textContent = expectedInput.value.length;
-            }
-
-            // Show notification if there's a success or error message
-            const errorMessage = `@Model.ErrorMessage`;
-            const successMessage = `@Model.SuccessMessage`;
-
-            if (errorMessage && errorMessage.trim()) {
-                showNotification('⚠️ Error', errorMessage, 'error');
-            } else if (successMessage && successMessage.trim()) {
-                showNotification(
-                    '✓ Success',
-                    successMessage,
-                    'success',
-                    function () {
-                        // Stay on page after success to allow submitting another report
-                    }
-                );
-            }
-
-            // Allow closing notification modal with Escape key
-            document.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape') {
-                    const notificationModal = document.getElementById('notificationModal');
-                    if (notificationModal && notificationModal.classList.contains('active')) {
-                        closeNotificationModal();
-                    }
-                }
-            });
-        });
-    </script>
-}
+    if (successMsg && successMsg.textContent.trim()) {
+        // Clear success message after 4 seconds
+        setTimeout(function() {
+            successMsg.textContent = '';
+            successMsg.classList.remove('show');
+        }, 4000);
+    }
+});
+</script>
