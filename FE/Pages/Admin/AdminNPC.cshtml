@@ -1,0 +1,291 @@
+@page
+@model FE.Pages.Admin.AdminNPCModel
+@{
+    ViewData["Title"] = "NPC Management";
+}
+
+<div class="container-fluid admin-wrapper mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4" style="border-bottom: 2px solid #333; padding-bottom: 15px;">
+        <h2 class="admin-title m-0 border-0 p-0">NPC Manager</h2>
+        <button class="btn-primary-custom" type="button" onclick="openCreateModal()" style="background-color: #6366f1; color: white; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 600;">+ Add New NPC</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="validation-message alert alert-danger" style="margin-bottom: 20px; background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;">@Model.ErrorMessage</div>
+    }
+
+    @if (Model.NPCs == null || Model.NPCs.Count == 0)
+    {
+        <div class="alert alert-info" style="margin-bottom: 20px; background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px;">
+            No NPCs found. Click the "Add New NPC" button to create one.
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">Image</th>
+                    <th style="width: 15%;">NPC Name</th>
+                    <th style="width: 12%;">Type</th>
+                    <th style="width: 12%;">Location</th>
+                    <th style="width: 20%;">Description</th>
+                    <th style="width: 15%;">Created Date</th>
+                    <th style="width: 16%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var npc in Model.NPCs ?? new List<FE.Pages.Admin.NPCDto>())
+                {
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(npc.ImagePath))
+                            {
+                                var fullImgUrl = npc.ImagePath;
+
+                                <div style="width: 48px; height: 48px; margin: 0 auto; background-color: #1e1e24; border: 1px solid #3f3f46; border-radius: 8px; padding: 4px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                                    <img src="@fullImgUrl" alt="NPC" style="max-width: 100%; max-height: 100%; object-fit: contain;" onerror="this.style.display='none';" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="width: 48px; height: 48px; margin: 0 auto; background-color: #25252d; border: 1px dashed #444; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <span style="color: #6b7280; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;">No Img</span>
+                                </div>
+                            }
+                        </td>
+                        <td style="color: #f4f4f5; font-weight: 700; font-size: 0.95rem;">@npc.Name</td>
+
+                        <td>
+                            <span style="background-color: #2b2b36; color: #d1d5db; border: 1px solid #4b5563; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.5px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                @npc.NPCType
+                            </span>
+                        </td>
+
+                        <td style="color: #9ca3af; font-size: 0.85rem;">@(string.IsNullOrEmpty(npc.Location) ? "-" : npc.Location)</td>
+                        <td style="color: #9ca3af; font-size: 0.85rem; line-height: 1.4;">@(string.IsNullOrEmpty(npc.Description) ? "-" : npc.Description)</td>
+                        <td style="color: #6b7280; font-size: 0.8rem;">@npc.CreatedDate.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <button type="button" class="action-btn" style="background-color: transparent; border: 1px solid #3b82f6; color: #3b82f6; border-radius: 6px; padding: 6px 16px; font-weight: 600; transition: 0.2s;"
+                                        data-id="@npc.Id"
+                                        data-name="@npc.Name"
+                                        data-desc="@npc.Description"
+                                        data-type="@npc.NPCType"
+                                        data-location="@npc.Location"
+                                        data-img="@npc.ImagePath"
+                                        onclick="openEditModal(this)"
+                                        onmouseover="this.style.backgroundColor='rgba(59, 130, 246, 0.1)'"
+                                        onmouseout="this.style.backgroundColor='transparent'">
+                                    Edit
+                                </button>
+                                <form method="post" asp-page-handler="Delete" style="display:inline;">
+                                    <input type="hidden" name="id" value="@npc.Id" />
+                                    <button type="submit" class="action-btn" style="background-color: transparent; border: 1px solid #ef4444; color: #ef4444; border-radius: 6px; padding: 6px 16px; font-weight: 600; transition: 0.2s; cursor: pointer;" 
+                                            onmouseover="this.style.backgroundColor='rgba(239, 68, 68, 0.1)'"
+                                            onmouseout="this.style.backgroundColor='transparent'"
+                                            onclick="return confirm('Are you sure?')">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Create NPC Modal -->
+<div class="custom-modal-overlay" id="createModal">
+    <div class="custom-modal">
+        <form method="post" asp-page-handler="Create" class="m-0" enctype="multipart/form-data">
+            <div class="modal-header-dark">
+                <h5 class="modal-title">Create New NPC</h5>
+                <button type="button" class="btn-close-custom" onclick="closeCreateModal()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8.00191 9.41621C7.61138 9.02569 7.61138 8.39252 8.00191 8.002C8.39243 7.61147 9.0256 7.61147 9.41612 8.002L12.0057 10.5916L14.5896 8.00771C14.9801 7.61719 15.6133 7.61719 16.0038 8.00771C16.3943 8.39824 16.3943 9.0314 16.0038 9.42193L13.4199 12.0058L16.0039 14.5897C16.3944 14.9803 16.3944 15.6134 16.0039 16.004C15.6133 16.3945 14.9802 16.3945 14.5896 16.004L12.0057 13.42L9.42192 16.0038C9.03139 16.3943 8.39823 16.3943 8.00771 16.0038C7.61718 15.6133 7.61718 14.9801 8.00771 14.5896L10.5915 12.0058L8.00191 9.41621Z" fill="#404040"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M23 4C23 2.34315 21.6569 1 20 1H4C2.34315 1 1 2.34315 1 4V20C1 21.6569 2.34315 23 4 23H20C21.6569 23 23 21.6569 23 20V4ZM21 4C21 3.44772 20.5523 3 20 3H4C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21H20C20.5523 21 21 20.5523 21 20V4Z" fill="#404040"></path> </g></svg>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-custom">
+                    <label class="form-label-custom">NPC Name *</label>
+                    <input type="text" name="name" class="dark-input" required />
+                </div>
+
+                <div class="mb-custom">
+                    <label class="form-label-custom">Description</label>
+                    <textarea name="description" class="dark-input" rows="2"></textarea>
+                </div>
+
+                <div class="form-row-custom">
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">NPC Type *</label>
+                        <select name="npcType" class="dark-input" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="Merchant">Merchant</option>
+                            <option value="QuestGiver">Quest Giver</option>
+                            <option value="DialogOnly">Dialog Only</option>
+                            <option value="Companion">Companion</option>
+                            <option value="Enemy">Enemy</option>
+                        </select>
+                    </div>
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">Location</label>
+                        <input type="text" name="location" class="dark-input" />
+                    </div>
+                </div>
+
+                <div class="mb-custom">
+                    <label class="form-label-custom">Image URL (Firebase)</label>
+                    <input type="text" name="imagePath" id="create_imagePath" class="dark-input" placeholder="Firebase URL will be inserted here" />
+                </div>
+
+                <div class="mb-custom">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button type="button" class="action-btn" style="background-color: #8b5cf6; color: white; border: none; padding: 8px 12px; font-size: 0.85rem;"
+                                onclick="showImageBrowser('create')">
+                            Browse Cloud
+                        </button>
+                        <button type="button" class="action-btn" style="background-color: #ec4899; color: white; border: none; padding: 8px 12px; font-size: 0.85rem;"
+                                onclick="showUploadDialog('create')">
+                            Upload Image
+                        </button>
+                    </div>
+                </div>
+
+                <div id="create_imagePreview" class="image-preview-box" style="display: none;">
+                    <img id="create_previewImg" src="" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 6px;" />
+                </div>
+            </div>
+            <div class="modal-footer-dark border-0 pt-0 pb-4 px-4 text-end">
+                <button type="submit" class="action-btn" style="background-color: #6366f1; color: white; border: none;">Create NPC</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit NPC Modal -->
+<div class="custom-modal-overlay" id="editModal">
+    <div class="custom-modal">
+        <form method="post" asp-page-handler="Update" class="m-0" enctype="multipart/form-data">
+            <div class="modal-header-dark">
+                <h5 class="modal-title">Edit NPC Info</h5>
+                <button type="button" class="btn-close-custom" onclick="closeEditModal()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8.00191 9.41621C7.61138 9.02569 7.61138 8.39252 8.00191 8.002C8.39243 7.61147 9.0256 7.61147 9.41612 8.002L12.0057 10.5916L14.5896 8.00771C14.9801 7.61719 15.6133 7.61719 16.0038 8.00771C16.3943 8.39824 16.3943 9.0314 16.0038 9.42193L13.4199 12.0058L16.0039 14.5897C16.3944 14.9803 16.3944 15.6134 16.0039 16.004C15.6133 16.3945 14.9802 16.3945 14.5896 16.004L12.0057 13.42L9.42192 16.0038C9.03139 16.3943 8.39823 16.3943 8.00771 16.0038C7.61718 15.6133 7.61718 14.9801 8.00771 14.5896L10.5915 12.0058L8.00191 9.41621Z" fill="#404040"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M23 4C23 2.34315 21.6569 1 20 1H4C2.34315 1 1 2.34315 1 4V20C1 21.6569 2.34315 23 4 23H20C21.6569 23 23 21.6569 23 20V4ZM21 4C21 3.44772 20.5523 3 20 3H4C3.44772 3 3 3.44772 3 4V20C3 20.5523 3.44772 21 4 21H20C20.5523 21 21 20.5523 21 20V4Z" fill="#404040"></path> </g></svg>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" name="id" id="edit_id" />
+                <input type="hidden" name="imagePath" id="edit_imagePath" />
+
+                <div class="mb-custom">
+                    <label class="form-label-custom">NPC Name *</label>
+                    <input type="text" name="name" id="edit_name" class="dark-input" required />
+                </div>
+
+                <div class="mb-custom">
+                    <label class="form-label-custom">Description</label>
+                    <textarea name="description" id="edit_description" class="dark-input" rows="2"></textarea>
+                </div>
+
+                <div class="form-row-custom">
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">NPC Type *</label>
+                        <select name="npcType" id="edit_npcType" class="dark-input" required>
+                            <option value="Merchant">Merchant</option>
+                            <option value="QuestGiver">Quest Giver</option>
+                            <option value="DialogOnly">Dialog Only</option>
+                            <option value="Companion">Companion</option>
+                            <option value="Enemy">Enemy</option>
+                        </select>
+                    </div>
+                    <div class="form-col-custom">
+                        <label class="form-label-custom">Location</label>
+                        <input type="text" name="location" id="edit_location" class="dark-input" />
+                    </div>
+                </div>
+
+                <div class="mb-custom">
+                    <label class="form-label-custom">Image URL (Firebase)</label>
+                    <input type="text" id="edit_imagePathDisplay" class="dark-input" readonly />
+                </div>
+
+                <div class="mb-custom">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button type="button" class="action-btn" style="background-color: #8b5cf6; color: white; border: none; padding: 8px 12px; font-size: 0.85rem;"
+                                onclick="showImageBrowser('edit')">
+                            Browse Cloud
+                        </button>
+                        <button type="button" class="action-btn" style="background-color: #ec4899; color: white; border: none; padding: 8px 12px; font-size: 0.85rem;"
+                                onclick="showUploadDialog('edit')">
+                            Upload Image
+                        </button>
+                    </div>
+                </div>
+
+                <div id="edit_imagePreview" class="image-preview-box" style="display: none;">
+                    <img id="edit_previewImg" src="" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 6px;" />
+                </div>
+            </div>
+            <div class="modal-footer-dark border-0 pt-0 pb-4 px-4 text-end">
+                <button type="submit" class="action-btn" style="background-color: #10b981; color: white; border: none;">Update NPC</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Image Browser Dialog -->
+<div id="imageBrowserDialog" class="modal-overlay" style="display: none;" onclick="closeImageBrowser(event)">
+    <div class="modal-content modal-content-large" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Select NPC Image</h2>
+            <button type="button" class="modal-close" onclick="closeImageBrowser()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="imageBrowserContent" class="image-browser-grid">
+                <div class="loading-spinner">Loading images...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" onclick="closeImageBrowser()">Close</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.adminNpcPageUrls = {
+            getImages: '@Url.Page("/Admin/AdminNPC", "GetImages")',
+            uploadImage: '@Url.Page("/Admin/AdminNPC", "UploadImage")'
+        };
+    </script>
+    <script src="~/js/admin-npc.js" asp-append-version="true"></script>
+}
+
+<!-- Image Upload Dialog -->
+<div id="uploadDialog" class="modal-overlay" style="display: none;" onclick="closeUploadDialog(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Upload NPC Image</h2>
+            <button type="button" class="modal-close" onclick="closeUploadDialog()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="uploadPreview" class="upload-preview" style="display: none;">
+                <img id="uploadImage" alt="Preview" style="max-width: 100%; max-height: 300px; border-radius: 6px;" />
+            </div>
+            <div class="form-group">
+                <label for="uploadFile" class="form-label">Select Image File</label>
+                <input type="file" id="uploadFile" class="form-control" accept="image/*" />
+                <small class="form-text">Max 5MB. Supported: JPG, PNG, GIF, WebP, BMP</small>
+            </div>
+            <div id="uploadStatus" class="upload-status" style="display: none;"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" onclick="closeUploadDialog()">Cancel</button>
+            <button type="button" class="btn-primary" id="uploadBtn" onclick="performImageUpload()">Upload & Insert</button>
+        </div>
+    </div>
+</div>
+
