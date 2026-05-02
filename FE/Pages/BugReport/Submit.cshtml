@@ -132,17 +132,3 @@
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const successMsg = document.querySelector('.validation-summary[role="status"]');
-
-    if (successMsg && successMsg.textContent.trim()) {
-        // Clear success message after 4 seconds
-        setTimeout(function() {
-            successMsg.textContent = '';
-            successMsg.classList.remove('show');
-        }, 4000);
-    }
-});
-</script>

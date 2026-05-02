@@ -1,0 +1,151 @@
+@page
+@model AdminBugReportsModel
+@{
+    ViewData["Title"] = "Bug Reports Management";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+}
+<div class="admin-container">
+    <div class="admin-wrapper">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1 class="admin-title">Bug Reports <span>Management</span></h1>
+            <p class="admin-description">Review and manage bug reports submitted by players</p>
+        </div>
+
+        <!-- Messages -->
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">
+                @Model.ErrorMessage
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+        {
+            <div class="alert alert-success">
+                @Model.SuccessMessage
+            </div>
+        }
+
+        <!-- Status Filter -->
+        <div class="filter-section">
+            <div class="filter-controls">
+                <label for="statusFilter" class="filter-label">Filter by Status:</label>
+                <select id="statusFilter" class="filter-select" onchange="filterByStatus(this.value)">
+                    <option value="">All</option>
+                    <option value="Open" selected="@(Model.FilterStatus == "Open")">Open</option>
+                    <option value="In Progress" selected="@(Model.FilterStatus == "In Progress")">In Progress</option>
+                    <option value="Resolved" selected="@(Model.FilterStatus == "Resolved")">Resolved</option>
+                    <option value="Closed" selected="@(Model.FilterStatus == "Closed")">Closed</option>
+                </select>
+            </div>
+            <div class="report-count">
+                <span>Total: <strong>@Model.BugReports.Count</strong></span>
+            </div>
+        </div>
+
+        <!-- Bug Reports Table -->
+        @if (Model.BugReports.Count > 0)
+        {
+            <div class="reports-container">
+                @foreach (var report in Model.BugReports)
+                {
+                    <div class="report-card">
+                        <!-- Report Header -->
+                        <div class="report-header">
+                            <div class="report-title">
+                                <h3>@report.Title</h3>
+                                <div class="report-meta">
+                                    <span class="severity severity-@report.Severity.ToLower()">@report.Severity</span>
+                                    <span class="status status-@report.Status.ToLower().Replace(" ", "-")">@report.Status</span>
+                                    <span class="user">@report.UserName</span>
+                                </div>
+                            </div>
+                            <div class="report-date">
+                                <small>@report.CreatedDate.ToString("MMM dd, yyyy HH:mm")</small>
+                            </div>
+                        </div>
+
+                        <!-- Report Content -->
+                        <div class="report-content">
+                            <div class="content-section">
+                                <label class="section-label">Description</label>
+                                <p class="section-text">@report.Description</p>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(report.Steps))
+                            {
+                                <div class="content-section">
+                                    <label class="section-label">Steps to Reproduce</label>
+                                    <p class="section-text">@report.Steps</p>
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrEmpty(report.ExpectedBehavior))
+                            {
+                                <div class="content-section">
+                                    <label class="section-label">Expected Behavior</label>
+                                    <p class="section-text">@report.ExpectedBehavior</p>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Edit Form -->
+                        <form method="post" asp-page-handler="Update" class="report-form">
+                            <input type="hidden" name="id" value="@report.Id" />
+
+                            <!-- Actual Behavior (Admin Edit) -->
+                            <div class="form-group">
+                                <label for="actualBehavior-@report.Id" class="form-label">Actual Behavior (Admin)</label>
+                                <textarea class="form-control" 
+                                          id="actualBehavior-@report.Id" 
+                                          name="actualBehavior" 
+                                          placeholder="Document the actual behavior..."
+                                          maxlength="500">@report.ActualBehavior</textarea>
+                                <small class="form-hint"><span id="charCount-@report.Id">@(report.ActualBehavior?.Length ?? 0)</span>/500</small>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="form-group">
+                                <label for="status-@report.Id" class="form-label">Status</label>
+                                <select class="form-control" id="status-@report.Id" name="status">
+                                    <option value="Open" selected="@(report.Status == "Open")">Open</option>
+                                    <option value="In Progress" selected="@(report.Status == "In Progress")">In Progress</option>
+                                    <option value="Resolved" selected="@(report.Status == "Resolved")">Resolved</option>
+                                    <option value="Closed" selected="@(report.Status == "Closed")">Closed</option>
+                                </select>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn-save">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <p>No bug reports found</p>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+function filterByStatus(status) {
+    const url = new URL(window.location);
+    url.searchParams.set('filterStatus', status);
+    window.location.href = url.toString();
+}
+
+// Character counters
+document.querySelectorAll('textarea[name="actualBehavior"]').forEach((textarea) => {
+    textarea.addEventListener('input', function() {
+        const charCount = document.getElementById('charCount-' + this.id.split('-')[1]);
+        if (charCount) charCount.textContent = this.value.length;
+    });
+});
+</script>
