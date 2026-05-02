@@ -22,7 +22,7 @@ namespace BussinessObjects.Models
 
         [MaxLength(50)]
         [Required]
-        public string NPCType { get; set; } = string.Empty; // e.g., "Merchant", "QuestGiver", "DialogOnly", "Companion"
+        public string NPCType { get; set; } = string.Empty; // e.g., "Merchant", "QuestGiver", "DialogOnly", "Companion", "Enemy"
 
         [DataType(DataType.DateTime)]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
