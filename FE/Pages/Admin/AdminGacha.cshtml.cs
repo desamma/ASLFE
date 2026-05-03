@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Net.Http.Headers;
@@ -24,13 +24,29 @@ namespace FE.Pages.Admin
         // ── GET: Load all banners ─────────────────────────────────────
         public async Task OnGetAsync()
         {
-            var client = _httpClientFactory.CreateClient("Api");
-            var response = await client.GetAsync("api/gacha/banners");
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var result = await response.Content.ReadFromJsonAsync<ApiResponse<List<GachaBannerDto>>>();
-                if (result?.Data != null)
-                    BannerList = result.Data;
+                var client = _httpClientFactory.CreateClient("Api");
+                var response = await client.GetAsync("api/admin/gacha/banners");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadFromJsonAsync<ApiResponse<List<GachaBannerDto>>>();
+                    if (result?.Data != null)
+                    {
+                        BannerList = result.Data;
+                        Console.WriteLine($"[AdminGacha] Loaded {BannerList.Count} banners");
+                    }
+                }
+                else
+                {
+                    var errorBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[AdminGacha] GET banners failed: {response.StatusCode} - {errorBody}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AdminGacha] Exception in OnGetAsync: {ex.Message}");
             }
         }
 
@@ -53,12 +69,15 @@ namespace FE.Pages.Admin
             content.Add(new StringContent(startDate.ToString("O")), "StartDate");
             content.Add(new StringContent(endDate.ToString("O")), "EndDate");
 
-            // Ưu tiên file upload, fallback về URL/path
+            // Ưu tiên: file upload > URL/path
             if (bannerImage != null && bannerImage.Length > 0)
             {
                 var fileContent = new StreamContent(bannerImage.OpenReadStream());
-                if (!string.IsNullOrWhiteSpace(bannerImage.ContentType))
-                    fileContent.Headers.ContentType = new MediaTypeHeaderValue(bannerImage.ContentType);
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(
+                    string.IsNullOrWhiteSpace(bannerImage.ContentType)
+                        ? "image/jpeg"
+                        : bannerImage.ContentType);
+                // Key phải khớp với [FromForm] ImageFile trong BE DTO
                 content.Add(fileContent, "ImageFile", bannerImage.FileName);
             }
             else if (!string.IsNullOrWhiteSpace(bannerImagePath))
@@ -67,16 +86,19 @@ namespace FE.Pages.Admin
             }
 
             var client = _httpClientFactory.CreateClient("Api");
-            var response = await client.PostAsync("api/gacha/banners", content);
+            var response = await client.PostAsync("api/admin/gacha/banners", content);
 
             IsSuccess = response.IsSuccessStatusCode;
             if (!IsSuccess)
             {
                 var errorBody = await response.Content.ReadAsStringAsync();
                 Message = TryExtractMessage(errorBody, "Lỗi khi tạo banner!");
+                Console.WriteLine($"[AdminGacha] Create banner failed: {response.StatusCode} - {errorBody}");
             }
             else
             {
+                var body = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[AdminGacha] Banner created: {body}");
                 Message = "Tạo banner thành công!";
             }
 
@@ -84,13 +106,14 @@ namespace FE.Pages.Admin
         }
 
         // ── POST: Update Banner ───────────────────────────────────────
-        // FIX: Thêm pityThreshold + hardPityThreshold (thiếu ở version cũ)
-        // FIX: Hỗ trợ cả file upload lẫn URL cho ảnh
+        // FIX 1: Thêm pityThreshold & hardPityThreshold vào signature
         public async Task<IActionResult> OnPostUpdateBannerAsync(
-            Guid bannerId, string name, string? description,
+            Guid bannerId,
+            string name, string? description,
             IFormFile? bannerImageFile, string? bannerImagePath,
             int costPerSinglePull, int costPerMultiPull,
-            int pityThreshold, int hardPityThreshold,
+            int pityThreshold,      // ← FIX 1: thêm
+            int hardPityThreshold,  // ← FIX 1: thêm
             DateTime startDate, DateTime endDate)
         {
             using var content = new MultipartFormDataContent();
@@ -99,31 +122,36 @@ namespace FE.Pages.Admin
             content.Add(new StringContent(description ?? ""), "Description");
             content.Add(new StringContent(costPerSinglePull.ToString()), "CostPerSinglePull");
             content.Add(new StringContent(costPerMultiPull.ToString()), "CostPerMultiPull");
-            content.Add(new StringContent(pityThreshold.ToString()), "PityThreshold");
-            content.Add(new StringContent(hardPityThreshold.ToString()), "HardPityThreshold");
+            content.Add(new StringContent(pityThreshold.ToString()), "PityThreshold");     // ← FIX 1
+            content.Add(new StringContent(hardPityThreshold.ToString()), "HardPityThreshold"); // ← FIX 1
             content.Add(new StringContent(startDate.ToString("O")), "StartDate");
             content.Add(new StringContent(endDate.ToString("O")), "EndDate");
 
+            // FIX 2: Key gửi lên phải là "ImageFile" để khớp [FromForm] trong UpdateGachaBannerRequest
             if (bannerImageFile != null && bannerImageFile.Length > 0)
             {
                 var fileContent = new StreamContent(bannerImageFile.OpenReadStream());
-                if (!string.IsNullOrWhiteSpace(bannerImageFile.ContentType))
-                    fileContent.Headers.ContentType = new MediaTypeHeaderValue(bannerImageFile.ContentType);
-                content.Add(fileContent, "ImageFile", bannerImageFile.FileName);
+                fileContent.Headers.ContentType = new MediaTypeHeaderValue(
+                    string.IsNullOrWhiteSpace(bannerImageFile.ContentType)
+                        ? "image/jpeg"
+                        : bannerImageFile.ContentType);
+                content.Add(fileContent, "ImageFile", bannerImageFile.FileName); // ← FIX 2: key = "ImageFile"
             }
             else if (!string.IsNullOrWhiteSpace(bannerImagePath))
             {
                 content.Add(new StringContent(bannerImagePath), "BannerImagePath");
             }
+            // Nếu cả 2 đều null → giữ ảnh cũ (backend xử lý allowEmpty: true)
 
             var client = _httpClientFactory.CreateClient("Api");
-            var response = await client.PutAsync($"api/gacha/banners/{bannerId}", content);
+            var response = await client.PutAsync($"api/admin/gacha/banners/{bannerId}", content);
 
             IsSuccess = response.IsSuccessStatusCode;
             if (!IsSuccess)
             {
                 var errorBody = await response.Content.ReadAsStringAsync();
                 Message = TryExtractMessage(errorBody, "Lỗi khi cập nhật banner!");
+                Console.WriteLine($"[AdminGacha] Update banner failed: {response.StatusCode} - {errorBody}");
             }
             else
             {
@@ -137,7 +165,8 @@ namespace FE.Pages.Admin
         public async Task<IActionResult> OnPostToggleAsync(Guid bannerId)
         {
             var client = _httpClientFactory.CreateClient("Api");
-            var response = await client.PutAsync($"api/gacha/banners/{bannerId}/toggle", null);
+            var response = await client.PatchAsync(
+                $"api/admin/gacha/banners/{bannerId}/toggle", null);
 
             IsSuccess = response.IsSuccessStatusCode;
             Message = IsSuccess ? "Đã thay đổi trạng thái banner!" : "Lỗi khi toggle banner!";
@@ -166,13 +195,15 @@ namespace FE.Pages.Admin
             };
 
             var client = _httpClientFactory.CreateClient("Api");
-            var response = await client.PostAsJsonAsync($"api/gacha/banners/{bannerId}/items", payload);
+            var response = await client.PostAsJsonAsync(
+                $"api/admin/gacha/banners/{bannerId}/items", payload);
 
             IsSuccess = response.IsSuccessStatusCode;
             if (!IsSuccess)
             {
                 var errorBody = await response.Content.ReadAsStringAsync();
                 Message = TryExtractMessage(errorBody, "Lỗi khi thêm item!");
+                Console.WriteLine($"[AdminGacha] AddItem failed: {response.StatusCode} - {errorBody}");
             }
             else
             {
@@ -183,11 +214,11 @@ namespace FE.Pages.Admin
         }
 
         // ── GET: All Items for Picker (JSON) ──────────────────────────
-        // FIX: Đổi endpoint về api/gacha/items (khớp với frontend hiện tại)
         public async Task<IActionResult> OnGetAllItemsAsync()
         {
             var client = _httpClientFactory.CreateClient("Api");
-            var response = await client.GetAsync("api/gacha/items");
+            var response = await client.GetAsync("api/admin/gacha/items-available");
+
             if (!response.IsSuccessStatusCode)
                 return new JsonResult(new { success = false, data = Array.Empty<object>() });
 
@@ -199,14 +230,15 @@ namespace FE.Pages.Admin
         public async Task<IActionResult> OnPostRemoveItemAsync(Guid bannerId, Guid itemId)
         {
             var client = _httpClientFactory.CreateClient("Api");
-            var response = await client.DeleteAsync($"api/gacha/banners/{bannerId}/items/{itemId}");
+            var response = await client.DeleteAsync(
+                $"api/admin/gacha/banners/{bannerId}/items/{itemId}");
 
             IsSuccess = response.IsSuccessStatusCode;
             Message = IsSuccess ? "Xóa item thành công!" : "Lỗi khi xóa item!";
             return RedirectToPage();
         }
 
-        // ── Helper: extract error message từ API response ─────────────
+        // ── Helper ────────────────────────────────────────────────────
         private static string TryExtractMessage(string json, string fallback)
         {
             try

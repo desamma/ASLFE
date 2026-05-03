@@ -1,4 +1,4 @@
-@page
+﻿@page
 @model FE.Pages.Admin.AdminGachaModel
 @{
     ViewData["Title"] = "Gacha Banner Manager";
@@ -7,7 +7,7 @@
 <div class="container-fluid admin-wrapper mt-4 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4" style="border-bottom: 2px solid #333; padding-bottom: 15px;">
         <h2 class="admin-title m-0 border-0 p-0">Gacha Banner Manager</h2>
-        <button class="btn-create-banner" type="button" onclick="openCreateBannerModal()" 
+        <button class="btn-create-banner" type="button" onclick="openCreateBannerModal()"
                 style="background-color: #6366f1; color: white; border: none; border-radius: 6px; padding: 8px 16px; font-weight: 600; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); cursor: pointer;">
             + Tao Banner Moi
         </button>
@@ -80,23 +80,23 @@
                         </div>
 
                         <div class="banner-actions">
-                            <button class="btn-action btn-items"
-                                    onclick="openAddItemModal('@banner.Id', '@banner.Name')">
+                            <button type="button" class="btn-action btn-items"
+                                    onclick="openAddItemModal(@System.Text.Json.JsonSerializer.Serialize(banner.Id), @System.Text.Json.JsonSerializer.Serialize(banner.Name), @banner.AllItems.Sum(i => i.DropRate).ToString("F2", System.Globalization.CultureInfo.InvariantCulture))">
                                 + Item
                             </button>
-                            <button class="btn-action btn-edit"
+                            <button type="button" class="btn-action btn-edit"
                                     onclick="openEditBannerModal(
-                                            '@banner.Id',
-                                            @Json.Serialize(banner.Name),
-                                            @Json.Serialize(banner.Description ?? ""),
-                                            @Json.Serialize(banner.BannerImagePath ?? ""),
-                                            @banner.CostPerSinglePull,
-                                            @banner.CostPerMultiPull,
-                                            @banner.PityThreshold,
-                                            @banner.HardPityThreshold,
-                                            '@banner.StartDate.ToString("yyyy-MM-dd")',
-                                            '@banner.EndDate.ToString("yyyy-MM-dd")'
-                                        )">
+                                                @System.Text.Json.JsonSerializer.Serialize(banner.Id),
+                                                @System.Text.Json.JsonSerializer.Serialize(banner.Name),
+                                                @System.Text.Json.JsonSerializer.Serialize(banner.Description ?? ""),
+                                                @System.Text.Json.JsonSerializer.Serialize(banner.BannerImagePath ?? ""),
+                                                @banner.CostPerSinglePull,
+                                                @banner.CostPerMultiPull,
+                                                @banner.PityThreshold,
+                                                @banner.HardPityThreshold,
+                                                @System.Text.Json.JsonSerializer.Serialize(banner.StartDate.ToString("yyyy-MM-dd")),
+                                                @System.Text.Json.JsonSerializer.Serialize(banner.EndDate.ToString("yyyy-MM-dd"))
+                                            )">
                                 Edit
                             </button>
                             <form method="post" asp-page-handler="Toggle" class="m-0 d-inline">
@@ -115,10 +115,11 @@
                                     @{
                                         var totalRate = banner.AllItems.Sum(i => i.DropRate);
                                         var rateColor = Math.Abs(totalRate - 100.0) <= 0.01 ? "#10b981" : "#f59e0b";
+                                        var rateWarning = Math.Abs(totalRate - 100.0) > 0.01;
                                     }
                                     <span style="color: @rateColor; font-size:0.72rem; font-weight:700;">
-                                        Total: @totalRate.ToString("F2")%
-                                        @if (Math.Abs(totalRate - 100.0) > 0.01)
+                                        TOTAL: @totalRate.ToString("F2")%
+                                        @if (rateWarning)
                                         {
                                             <span title="Total drop rate must equal 100%">WARNING</span>
                                         }
@@ -158,7 +159,9 @@
     </div>
 </div>
 
-<!-- MODAL: Create Banner -->
+<!-- ═══════════════════════════════════════════════
+     MODAL: Create Banner
+═══════════════════════════════════════════════ -->
 <div class="custom-modal-overlay" id="createBannerModal">
     <div class="custom-modal gacha-modal">
         <form method="post" asp-page-handler="CreateBanner" enctype="multipart/form-data" class="m-0">
@@ -182,15 +185,10 @@
                     </div>
                 </div>
 
-                <!-- Image: File or URL -->
                 <div class="image-input-group">
                     <div class="image-tab-bar">
-                        <button type="button" class="img-tab active" onclick="switchImgTab('create', 'file', this)">
-                            Upload File
-                        </button>
-                        <button type="button" class="img-tab" onclick="switchImgTab('create', 'url', this)">
-                            Use URL
-                        </button>
+                        <button type="button" class="img-tab active" onclick="switchImgTab('create', 'file', this)">Upload File</button>
+                        <button type="button" class="img-tab" onclick="switchImgTab('create', 'url',  this)">Use URL</button>
                     </div>
                     <div id="create-img-file" class="img-tab-panel">
                         <label class="form-label-gacha">Select Image</label>
@@ -205,7 +203,8 @@
                                 <span class="drop-text">Drag and drop or click to select</span>
                                 <span class="drop-hint">PNG, JPG, WebP - Max 5MB</span>
                             </div>
-                            <img id="createImgPreview" src="" alt="" style="display:none;width:100%;height:120px;object-fit:cover;border-radius:8px;" />
+                            <img id="createImgPreview" src="" alt=""
+                                 style="display:none;width:100%;height:120px;object-fit:cover;border-radius:8px;" />
                         </div>
                     </div>
                     <div id="create-img-url" class="img-tab-panel" style="display:none;">
@@ -249,17 +248,22 @@
 
             <div class="modal-footer-dark">
                 <button type="button" class="btn-cancel-modal" onclick="closeModal('createBannerModal')">Cancel</button>
-                <button type="submit" class="btn-save-modal">Create Banner</button>
+                <button type="submit" class="btn-save-modal" onclick="return validateDates('createBannerModal')">Create Banner</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- MODAL: Edit Banner -->
+<!-- ═══════════════════════════════════════════════
+     MODAL: Edit Banner
+═══════════════════════════════════════════════ -->
 <div class="custom-modal-overlay" id="editBannerModal">
     <div class="custom-modal gacha-modal">
         <form method="post" asp-page-handler="UpdateBanner" enctype="multipart/form-data" class="m-0">
             <input type="hidden" name="bannerId" id="editBannerId" />
+            <input type="hidden" name="pityThreshold" id="editPityThreshold" />
+            <input type="hidden" name="hardPityThreshold" id="editHardPityThreshold" />
+
             <div class="modal-header-dark">
                 <div class="modal-title-wrap">
                     <span class="modal-icon" style="color:#60a5fa;">Edit</span>
@@ -280,15 +284,10 @@
                     </div>
                 </div>
 
-                <!-- Image: File or URL -->
                 <div class="image-input-group">
                     <div class="image-tab-bar">
-                        <button type="button" class="img-tab active" onclick="switchImgTab('edit', 'url', this)">
-                            Keep/Change URL
-                        </button>
-                        <button type="button" class="img-tab" onclick="switchImgTab('edit', 'file', this)">
-                            Upload New File
-                        </button>
+                        <button type="button" class="img-tab active" onclick="switchImgTab('edit', 'url',  this)">Keep/Change URL</button>
+                        <button type="button" class="img-tab" onclick="switchImgTab('edit', 'file', this)">Upload New File</button>
                     </div>
                     <div id="edit-img-url" class="img-tab-panel">
                         <label class="form-label-gacha">Image URL</label>
@@ -312,12 +311,13 @@
                                 <span class="drop-text">Drag and drop or click to select</span>
                                 <span class="drop-hint">Will replace old image</span>
                             </div>
-                            <img id="editImgPreview" src="" alt="" style="display:none;width:100%;height:120px;object-fit:cover;border-radius:8px;" />
+                            <img id="editImgPreview" src="" alt=""
+                                 style="display:none;width:100%;height:120px;object-fit:cover;border-radius:8px;" />
                         </div>
                     </div>
                 </div>
 
-                <div class="form-row-4">
+                <div class="form-row-2">
                     <div class="form-group">
                         <label class="form-label-gacha gem-label">Single Cost</label>
                         <input type="number" name="costPerSinglePull" id="editSingleCost" class="dark-input" min="1" required />
@@ -325,14 +325,6 @@
                     <div class="form-group">
                         <label class="form-label-gacha gem-label">Multi Cost</label>
                         <input type="number" name="costPerMultiPull" id="editMultiCost" class="dark-input" min="1" required />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label-gacha pity-label">Soft Pity</label>
-                        <input type="number" name="pityThreshold" id="editPity" class="dark-input" min="1" required />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label-gacha pity-label">Hard Pity</label>
-                        <input type="number" name="hardPityThreshold" id="editHardPity" class="dark-input" min="1" required />
                     </div>
                 </div>
 
@@ -350,7 +342,9 @@
 
             <div class="modal-footer-dark">
                 <button type="button" class="btn-cancel-modal" onclick="closeModal('editBannerModal')">Cancel</button>
-                <button type="submit" class="btn-save-modal" style="background:linear-gradient(135deg,#3b82f6,#6366f1);">
+                <button type="submit" class="btn-save-modal"
+                        style="background:linear-gradient(135deg,#3b82f6,#6366f1);"
+                        onclick="return validateDates('editBannerModal')">
                     Save Changes
                 </button>
             </div>
@@ -358,7 +352,9 @@
     </div>
 </div>
 
-<!-- MODAL: Add Item to Banner -->
+<!-- ═══════════════════════════════════════════════
+     MODAL: Add Item to Banner
+═══════════════════════════════════════════════ -->
 <div class="custom-modal-overlay" id="addItemModal">
     <div class="custom-modal gacha-modal" style="max-width:700px;">
         <form method="post" asp-page-handler="AddItem" class="m-0">
@@ -370,7 +366,7 @@
                 <div class="modal-title-wrap">
                     <span class="modal-icon" style="color:#f59e0b;">*</span>
                     <h5 class="modal-title">
-                        Add Item - <span id="addItemBannerName" style="color:#f59e0b;"></span>
+                        Add Item — <span id="addItemBannerName" style="color:#f59e0b;"></span>
                     </h5>
                 </div>
                 <button type="button" class="btn-close-custom" onclick="closeModal('addItemModal')">X</button>
@@ -398,24 +394,29 @@
                         <span>Select Item From Database</span>
                         <span id="itemCountLabel" style="color:#52525b;"></span>
                     </div>
-                    <div id="itemPickerList" style="max-height:280px; overflow-y:auto; padding:8px;
-                                                    scrollbar-width:thin; scrollbar-color:#27272a transparent;">
+                    <div id="itemPickerList"
+                         style="max-height:280px; overflow-y:auto; padding:8px;
+                                scrollbar-width:thin; scrollbar-color:#27272a transparent;">
                         <div style="text-align:center; padding:30px; color:#52525b; font-size:0.85rem;">
                             <span id="itemListStatus">Loading items...</span>
                         </div>
                     </div>
                 </div>
 
-                <div id="selectedItemPreview" style="display:none; background:#0d0d10;
-                     border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:14px 16px;">
+                <div id="selectedItemPreview"
+                     style="display:none; background:#0d0d10;
+                            border:1px solid rgba(245,158,11,0.3); border-radius:10px; padding:14px 16px;">
                     <div style="font-size:0.68rem; font-weight:700; letter-spacing:1px;
                                 color:#f59e0b; text-transform:uppercase; margin-bottom:10px;">
                         Selected
                     </div>
                     <div class="item-row" style="background:#1a1a22; border-color:#27272a;">
-                        <img id="previewSelectedImg" src="" style="width:36px;height:36px;border-radius:6px;
-                                                                    object-fit:cover;display:none;" />
-                        <div class="item-star-badge" id="previewSelectedStar" style="background:rgba(245,158,11,0.2);color:#f59e0b;">-</div>
+                        <img id="previewSelectedImg" src=""
+                             style="width:36px;height:36px;border-radius:6px;object-fit:cover;display:none;" />
+                        <div class="item-star-badge" id="previewSelectedStar"
+                             style="background:rgba(245,158,11,0.2);color:#f59e0b;">
+                            -
+                        </div>
                         <div class="item-details">
                             <span class="item-name" id="previewSelectedName">-</span>
                             <span class="item-cat" id="previewSelectedCat">-</span>
@@ -431,7 +432,7 @@
                         <p class="input-hint" id="remainingRateHint"></p>
                     </div>
                     <div class="form-group">
-                        <label class="form-label-gacha star-label">Star Rating (override)</label>
+                        <label class="form-label-gacha star-label">Star Rating</label>
                         <select name="starRating" id="addStarRating" class="dark-input dark-select" required>
                             <option value="3">3 Star</option>
                             <option value="4">4 Star</option>
@@ -442,6 +443,7 @@
 
                 <div class="form-group featured-toggle-wrap">
                     <label class="featured-toggle-label">
+                        <input type="hidden" name="isFeatured" value="false" />
                         <input type="checkbox" name="isFeatured" class="featured-checkbox" value="true" />
                         <span class="toggle-track"><span class="toggle-thumb"></span></span>
                         <span class="featured-text">Featured Item (Rate-Up)</span>
@@ -467,76 +469,69 @@
 
 @section Scripts {
     <script>
+        // ── Modal helpers ─────────────────────────────────────────────
         function openCreateBannerModal() {
+            const today   = new Date();
+            const endDate = new Date(today);
+            endDate.setDate(endDate.getDate() + 30);
+            document.querySelector('#createBannerModal input[name="startDate"]').value = today.toISOString().split('T')[0];
+            document.querySelector('#createBannerModal input[name="endDate"]').value   = endDate.toISOString().split('T')[0];
             document.getElementById('createBannerModal').classList.add('show');
         }
 
         function closeModal(id) {
             document.getElementById(id).classList.remove('show');
-            if (id === 'createBannerModal') {
-                resetFileInput('bannerImage', 'createImgPreview', 'createDropZone');
-            }
-            if (id === 'editBannerModal') {
-                resetFileInput('editBannerImageFile', 'editImgPreview', 'editDropZone');
-            }
+            if (id === 'createBannerModal') resetFileInput('bannerImage',        'createImgPreview', 'createDropZone');
+            if (id === 'editBannerModal')   resetFileInput('editBannerImageFile', 'editImgPreview',   'editDropZone');
         }
 
+        function validateDates(modalId) {
+            const modal = document.getElementById(modalId);
+            const s = modal.querySelector('input[name="startDate"]').value;
+            const e = modal.querySelector('input[name="endDate"]').value;
+            if (!s || !e)              { alert('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc!'); return false; }
+            if (new Date(s) >= new Date(e)) { alert('Ngày kết thúc phải sau ngày bắt đầu!');            return false; }
+            return true;
+        }
+
+        // Close on backdrop click
         document.querySelectorAll('.custom-modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', e => {
-                if (e.target === overlay) {
-                    closeModal(overlay.id);
-                }
-            });
+            overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(overlay.id); });
         });
-
+        // Close on Escape
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.custom-modal-overlay.show').forEach(m => {
-                    closeModal(m.id);
-                });
-            }
+            if (e.key === 'Escape')
+                document.querySelectorAll('.custom-modal-overlay.show').forEach(m => closeModal(m.id));
         });
 
+        // ── Image tab switcher ────────────────────────────────────────
         function switchImgTab(prefix, tab, btn) {
             btn.closest('.image-tab-bar').querySelectorAll('.img-tab').forEach(t => t.classList.remove('active'));
             btn.classList.add('active');
-
-            const filePanel = document.getElementById(`${prefix}-img-file`);
-            const urlPanel  = document.getElementById(`${prefix}-img-url`);
-            if (tab === 'file') {
-                filePanel.style.display = 'block';
-                urlPanel.style.display  = 'none';
-            } else {
-                filePanel.style.display = 'none';
-                urlPanel.style.display  = 'block';
-            }
+            document.getElementById(`${prefix}-img-file`).style.display = tab === 'file' ? 'block' : 'none';
+            document.getElementById(`${prefix}-img-url`).style.display  = tab === 'url'  ? 'block' : 'none';
         }
 
         function previewImage(input, previewId, dropZoneId) {
-            const preview  = document.getElementById(previewId);
-            const dropZone = document.getElementById(dropZoneId);
-            const label    = document.getElementById(dropZoneId + '-label');
-
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                    if (label) label.style.display = 'none';
-                    if (dropZone) dropZone.classList.add('has-preview');
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
+            if (!input.files?.[0]) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const preview = document.getElementById(previewId);
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                const label = document.getElementById(dropZoneId + '-label');
+                if (label) label.style.display = 'none';
+                document.getElementById(dropZoneId)?.classList.add('has-preview');
+            };
+            reader.readAsDataURL(input.files[0]);
         }
 
         function handleFileDrop(event, inputName, dropZoneId, previewId) {
             event.preventDefault();
             const dropZone = document.getElementById(dropZoneId);
             dropZone.classList.remove('dragover');
-
             const file = event.dataTransfer.files[0];
-            if (!file || !file.type.startsWith('image/')) return;
-
+            if (!file?.type.startsWith('image/')) return;
             const input = dropZone.querySelector(`input[name="${inputName}"]`);
             if (input) {
                 const dt = new DataTransfer();
@@ -547,37 +542,36 @@
         }
 
         function resetFileInput(inputId, previewId, dropZoneId) {
-            const input   = document.getElementById(inputId);
-            const preview = document.getElementById(previewId);
-            const label   = document.getElementById(dropZoneId + '-label');
-            const dropZone= document.getElementById(dropZoneId);
-            if (input)   input.value = '';
-            if (preview) { preview.src = ''; preview.style.display = 'none'; }
-            if (label)   label.style.display = 'flex';
-            if (dropZone)dropZone.classList.remove('has-preview');
+            const input    = document.getElementById(inputId);
+            const preview  = document.getElementById(previewId);
+            const label    = document.getElementById(dropZoneId + '-label');
+            const dropZone = document.getElementById(dropZoneId);
+            if (input)    input.value = '';
+            if (preview)  { preview.src = ''; preview.style.display = 'none'; }
+            if (label)    label.style.display = 'flex';
+            if (dropZone) dropZone.classList.remove('has-preview');
         }
 
+        // ── Edit Banner modal ─────────────────────────────────────────
+        // FIX 1: Nhận thêm pity & hardPity, gán vào hidden input
         function openEditBannerModal(id, name, desc, img, single, multi, pity, hardPity, start, end) {
-            document.getElementById('editBannerId').value    = id;
-            document.getElementById('editName').value        = name;
-            document.getElementById('editDescription').value = desc;
-            document.getElementById('editImagePath').value   = img;
-            document.getElementById('editSingleCost').value  = single;
-            document.getElementById('editMultiCost').value   = multi;
-            document.getElementById('editPity').value        = pity;
-            document.getElementById('editHardPity').value    = hardPity;
-            document.getElementById('editStartDate').value   = start;
-            document.getElementById('editEndDate').value     = end;
+            document.getElementById('editBannerId').value           = id;
+            document.getElementById('editName').value               = name;
+            document.getElementById('editDescription').value        = desc;
+            document.getElementById('editImagePath').value          = img;
+            document.getElementById('editSingleCost').value         = single;
+            document.getElementById('editMultiCost').value          = multi;
+            document.getElementById('editPityThreshold').value      = pity;      // FIX 1
+            document.getElementById('editHardPityThreshold').value  = hardPity;  // FIX 1
+            document.getElementById('editStartDate').value          = start;
+            document.getElementById('editEndDate').value            = end;
 
             const currentImgWrap = document.getElementById('editCurrentImgPreview');
             const currentImg     = document.getElementById('editCurrentImg');
-            if (img && img.trim() !== '') {
-                currentImg.src = img;
-                currentImgWrap.style.display = 'block';
-            } else {
-                currentImgWrap.style.display = 'none';
-            }
+            if (img?.trim()) { currentImg.src = img; currentImgWrap.style.display = 'block'; }
+            else             { currentImgWrap.style.display = 'none'; }
 
+            // Reset về tab URL mặc định
             const urlTab = document.querySelector('#editBannerModal .img-tab');
             if (urlTab) switchImgTab('edit', 'url', urlTab);
             resetFileInput('editBannerImageFile', 'editImgPreview', 'editDropZone');
@@ -585,27 +579,31 @@
             document.getElementById('editBannerModal').classList.add('show');
         }
 
-        let allItems     = [];
-        let filteredItems= [];
+        // ── Add Item modal ────────────────────────────────────────────
+        let allItems           = [];
+        let filteredItems      = [];
         let currentBannerItems = [];
+        let currentBannerTotalRate = 0;
 
-        async function openAddItemModal(bannerId, bannerName) {
-            document.getElementById('addItemBannerId').value  = bannerId;
+        async function openAddItemModal(bannerId, bannerName, currentTotalRate) {
+            document.getElementById('addItemBannerId').value        = bannerId;
             document.getElementById('addItemBannerName').textContent = bannerName;
+            currentBannerTotalRate = parseFloat(currentTotalRate) || 0;
 
             clearSelectedItem();
-            document.getElementById('itemSearchInput').value  = '';
-            document.getElementById('itemTypeFilter').value   = '';
-            document.getElementById('addDropRate').value      = '';
-            document.getElementById('remainingRateHint').textContent = '';
+            document.getElementById('itemSearchInput').value = '';
+            document.getElementById('itemTypeFilter').value  = '';
+            document.getElementById('addDropRate').value     = '';
+            updateRemainingHint();
 
             document.getElementById('addItemModal').classList.add('show');
 
+            // Lấy danh sách item đã có trong banner này
             currentBannerItems = Array.from(
-                document.querySelectorAll(`form[asp-page-handler*="RemoveItem"] input[name="itemId"]`)
+                document.querySelectorAll(`form[action*="RemoveItem"] input[name="itemId"]`)
             ).filter(el => {
-                const bannerInput = el.closest('form').querySelector('input[name="bannerId"]');
-                return bannerInput && bannerInput.value === bannerId;
+                const bi = el.closest('form').querySelector('input[name="bannerId"]');
+                return bi?.value === bannerId;
             }).map(el => el.value);
 
             if (allItems.length === 0) {
@@ -618,14 +616,11 @@
         async function loadAllItems() {
             document.getElementById('itemPickerList').innerHTML =
                 '<div style="text-align:center;padding:30px;color:#52525b;font-size:0.85rem;">Loading items...</div>';
-
             try {
                 const res  = await fetch('?handler=AllItems', { credentials: 'same-origin' });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
                 const json = await res.json();
-                allItems = json.data ?? json.Data ?? json ?? [];
-
+                allItems   = json.data ?? json.Data ?? json ?? [];
                 if (!Array.isArray(allItems)) allItems = [];
 
                 const types  = [...new Set(allItems.map(i => i.type || i.Type || '').filter(Boolean))].sort();
@@ -651,7 +646,6 @@
         function filterItems() {
             const search = document.getElementById('itemSearchInput').value.toLowerCase().trim();
             const type   = document.getElementById('itemTypeFilter').value.toLowerCase();
-
             filteredItems = allItems.filter(item => {
                 const name = (item.name || item.Name || '').toLowerCase();
                 const cat  = (item.type || item.Type || '').toLowerCase();
@@ -663,28 +657,27 @@
         function renderItems(items) {
             const list = document.getElementById('itemPickerList');
             document.getElementById('itemCountLabel').textContent = `${items.length} items`;
-
             if (items.length === 0) {
                 list.innerHTML = '<div style="text-align:center;padding:20px;color:#52525b;font-size:0.85rem;">No items found</div>';
                 return;
             }
-
             const selectedId = document.getElementById('selectedItemId').value;
-
             list.innerHTML = items.map(item => {
-                const id       = item.id || item.Id || item.itemId || item.ItemId;
-                const name     = item.name || item.Name || 'Unknown';
-                const type     = item.type || item.Type || '';
-                const imgPath  = item.imagePath || item.ImagePath || '';
-                const isSelected  = String(id) === String(selectedId);
-                const alreadyIn   = currentBannerItems.includes(String(id));
+                const id         = item.itemId || item.ItemId || item.id || item.Id;
+                const name       = item.name     || item.Name     || 'Unknown';
+                const type       = item.type     || item.Type     || '';
+                const imgPath    = item.imagePath || item.ImagePath || '';
+                const isSelected = String(id) === String(selectedId);
+                const alreadyIn  = currentBannerItems.includes(String(id));
 
                 const borderColor = isSelected ? 'rgba(245,158,11,0.4)' : alreadyIn ? 'rgba(16,185,129,0.25)' : '#27272a';
                 const bgColor     = isSelected ? 'rgba(245,158,11,0.08)' : alreadyIn ? 'rgba(16,185,129,0.05)' : '#1a1a22';
                 const cursor      = alreadyIn && !isSelected ? 'not-allowed' : 'pointer';
                 const opacity     = alreadyIn && !isSelected ? '0.55' : '1';
+                const clickFn     = alreadyIn && !isSelected ? '' :
+                    `selectItem('${id}','${name.replace(/'/g,"\\'")}','${type}','${imgPath.replace(/'/g,"\\'")}', this)`;
 
-                return `<div onclick="${alreadyIn && !isSelected ? '' : `selectItem('${id}','${name.replace(/'/g,"\\'")}','${type}','${imgPath.replace(/'/g,"\\'")}', this)`}"
+                return `<div onclick="${clickFn}"
                              style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;
                                     margin-bottom:4px;cursor:${cursor};opacity:${opacity};
                                     border:1px solid ${borderColor};background:${bgColor};transition:all 0.15s;">
@@ -692,14 +685,14 @@
                         ? `<img src="${imgPath}" style="width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;"
                                  onerror="this.style.display='none'" />`
                         : `<div style="width:36px;height:36px;border-radius:6px;background:#27272a;display:flex;
-                                       align-items:center;justify-content:center;color:#52525b;font-size:1rem;flex-shrink:0;">Item</div>`}
+                                       align-items:center;justify-content:center;color:#52525b;font-size:0.8rem;flex-shrink:0;">?</div>`}
                     <div style="flex:1;min-width:0;">
                         <div style="font-size:0.87rem;font-weight:600;color:#e4e4e7;
-                                     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
+                                    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</div>
                         <div style="font-size:0.72rem;color:#52525b;">${type || 'No type'}</div>
                     </div>
                     ${isSelected
-                        ? '<span style="color:#f59e0b;font-size:1rem;flex-shrink:0;">Check</span>'
+                        ? '<span style="color:#f59e0b;font-size:1rem;flex-shrink:0;">&#10003;</span>'
                         : alreadyIn
                             ? '<span style="color:#10b981;font-size:0.7rem;flex-shrink:0;white-space:nowrap;">Added</span>'
                             : ''}
@@ -708,16 +701,15 @@
         }
 
         function selectItem(id, name, type, imgPath, el) {
-            document.getElementById('selectedItemId').value      = id;
-            document.getElementById('selectedItemCategory').value= type;
-
+            document.getElementById('selectedItemId').value       = id;
+            document.getElementById('selectedItemCategory').value = type;
             document.getElementById('previewSelectedName').textContent = name;
             document.getElementById('previewSelectedCat').textContent  = type || '-';
             document.getElementById('previewSelectedStar').textContent = '-';
 
             const img = document.getElementById('previewSelectedImg');
             if (imgPath) { img.src = imgPath; img.style.display = 'block'; }
-            else { img.style.display = 'none'; }
+            else          { img.style.display = 'none'; }
 
             document.getElementById('selectedItemPreview').style.display = 'block';
 
@@ -725,16 +717,24 @@
             btn.style.opacity      = '1';
             btn.style.pointerEvents= 'auto';
 
+            updateRemainingHint();
             renderItems(filteredItems);
         }
 
         function clearSelectedItem() {
-            document.getElementById('selectedItemId').value      = '';
-            document.getElementById('selectedItemCategory').value= '';
+            document.getElementById('selectedItemId').value       = '';
+            document.getElementById('selectedItemCategory').value = '';
             document.getElementById('selectedItemPreview').style.display = 'none';
             const btn = document.getElementById('btnAddItemSubmit');
             btn.style.opacity      = '0.4';
             btn.style.pointerEvents= 'none';
+        }
+
+        function updateRemainingHint() {
+            const hint = document.getElementById('remainingRateHint');
+            if (!hint) return;
+            const remaining = Math.max(0, 100 - currentBannerTotalRate);
+            hint.textContent = `Current total: ${currentBannerTotalRate.toFixed(2)}% — Remaining: ${remaining.toFixed(2)}%`;
         }
     </script>
 }
