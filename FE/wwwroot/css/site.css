@@ -503,14 +503,10 @@ body {
         cursor: not-allowed;
     }
 
-    .btn-pay .spinner {
-        display: none;
+    .btn-spinner {
+        display: none !important;
         width: 16px;
         height: 16px;
-        border: 2px solid rgba(255,255,255,0.3);
-        border-top-color: white;
-        border-radius: 50%;
-        animation: spin 0.7s linear infinite;
         margin: 0 auto;
     }
 
@@ -518,8 +514,8 @@ body {
         display: none;
     }
 
-    .btn-pay.loading .spinner {
-        display: block;
+    .btn-pay.loading .btn-spinner {
+        display: block !important;
     }
 
 @keyframes spin {
