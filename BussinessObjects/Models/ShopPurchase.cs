@@ -26,7 +26,7 @@ namespace BussinessObjects.Models
 
         [Required]
         [Display(Name = "Amount Paid")]
-        public decimal AmountPaid { get; set; }
+        public int AmountPaid { get; set; }
 
         [DataType(DataType.DateTime)]
         [Display(Name = "Purchase Date")]

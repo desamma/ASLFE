@@ -9,10 +9,12 @@ namespace FE.Pages.News
     public class ReadNewsModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
-        public ReadNewsModel(IHttpClientFactory httpClientFactory)
+        public ReadNewsModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
 
         public GameNews? News { get; set; }
@@ -108,8 +110,8 @@ namespace FE.Pages.News
                     var match = Regex.Match(trimmedLine, @"\[IMAGE:(.*?)\]");
                     if (match.Success && !string.IsNullOrEmpty(match.Groups[1].Value))
                     {
-                        var imageName = HtmlEncode(match.Groups[1].Value);
-                        htmlBuilder.Append($@"<img src=""/images/{imageName}"" alt=""News Image"" style=""max-width: 100%; height: auto; margin: 12px 0; border-radius: 6px;"" />");
+                        var imageUrl = HtmlEncode(ResolveImageUrl(match.Groups[1].Value));
+                        htmlBuilder.Append($@"<img src=""{imageUrl}"" alt=""News Image"" style=""max-width: 100%; height: auto; margin: 12px 0; border-radius: 6px;"" />");
                     }
                 }
                 else if (trimmedLine.Length > 0)
@@ -126,12 +128,33 @@ namespace FE.Pages.News
             return htmlBuilder.ToString();
         }
 
-        private string HtmlEncode(string text)
+        private static string HtmlEncode(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
 
             return System.Net.WebUtility.HtmlEncode(text);
+        }
+
+        private string ResolveImageUrl(string imageValue)
+        {
+            if (string.IsNullOrWhiteSpace(imageValue))
+                return string.Empty;
+
+            if (Uri.TryCreate(imageValue, UriKind.Absolute, out var absoluteUri))
+                return absoluteUri.ToString();
+
+            var bucket = _configuration["FirebaseStorage:Bucket"];
+            if (string.IsNullOrWhiteSpace(bucket))
+                return imageValue;
+
+            var normalizedPath = imageValue.Replace('\\', '/').TrimStart('/');
+            if (normalizedPath.StartsWith("News/", StringComparison.OrdinalIgnoreCase))
+            {
+                normalizedPath = normalizedPath[5..];
+            }
+
+            return $"https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{Uri.EscapeDataString(normalizedPath)}?alt=media";
         }
     }
 }

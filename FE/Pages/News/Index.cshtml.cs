@@ -8,10 +8,12 @@ namespace FE.Pages.News
     public class IndexModel : PageModel
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
-        public IndexModel(IHttpClientFactory httpClientFactory)
+        public IndexModel(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
 
         public List<GameNews> NewsList { get; set; } = new();
@@ -71,6 +73,27 @@ namespace FE.Pages.News
                 ErrorMessage = $"An error occurred: {ex.Message}";
                 return Page();
             }
+        }
+
+        public string ResolveBannerUrl(string? bannerPath)
+        {
+            if (string.IsNullOrWhiteSpace(bannerPath))
+                return string.Empty;
+
+            if (Uri.TryCreate(bannerPath, UriKind.Absolute, out var absoluteUri))
+                return absoluteUri.ToString();
+
+            var bucket = _configuration["Firebase:StorageBucket"];
+            if (string.IsNullOrWhiteSpace(bucket))
+                return $"/images/{bannerPath}";
+
+            var normalizedPath = bannerPath.Replace('\\', '/').TrimStart('/');
+            if (normalizedPath.StartsWith("News/", StringComparison.OrdinalIgnoreCase))
+            {
+                normalizedPath = normalizedPath[5..];
+            }
+
+            return $"https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{Uri.EscapeDataString(normalizedPath)}?alt=media";
         }
     }
 }

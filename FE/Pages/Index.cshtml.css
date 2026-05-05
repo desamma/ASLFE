@@ -134,7 +134,7 @@
     position: relative;
     min-height: 70vh; /* reduced from 100vh to calm the height */
     background: linear-gradient(135deg, #1a0a00 0%, #4a1a00 50%, #2a0a00 100%);
-    background-image: url('/images/hero-background.jpg');
+    background-image: url('https://firebasestorage.googleapis.com/v0/b/ashen-light-rpg.firebasestorage.app/o/images%2Fhero-background.jpg?alt=media');
     background-size: cover;
     background-position: center;
     background-blend-mode: overlay;
@@ -337,34 +337,6 @@
         display: block;
     }
 
-.map-legend {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.8);
-    padding: 20px;
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    font-size: 0.9rem;
-}
-
-    .legend-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .legend-item .icon {
-        width: 20px;
-        height: 20px;
-        margin-right: 10px;
-        color: #ff6b35;
-    }
-
 .feature-cards {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -415,9 +387,9 @@
 .game-categories {
     max-width: 1400px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .category-group h3 {
@@ -426,36 +398,45 @@
     color: #ffffff;
     border-bottom: 2px solid #ff6b35;
     padding-bottom: 10px;
+    display: none;
 }
 
 .category-links {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    flex-direction: row;
+    gap: 40px;
+    justify-content: center;
+    align-items: stretch;
+    width: 100%;
 }
 
 .category-link {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 15px 20px;
+    justify-content: center;
+    padding: 30px 80px;
     background: rgba(255, 107, 53, 0.1);
     border: 2px solid rgba(255, 107, 53, 0.3);
     border-radius: 10px;
     color: #ffffff;
     text-decoration: none;
     transition: all 0.3s ease;
+    flex: 1;
+    max-width: 280px;
+    text-align: center;
 }
 
     .category-link:hover {
         background: rgba(255, 107, 53, 0.2);
         border-color: #ff6b35;
-        transform: translateX(10px);
+        transform: translateY(-5px);
     }
 
     .category-link svg {
-        width: 24px;
-        height: 24px;
-        margin-right: 15px;
+        width: 32px;
+        height: 32px;
+        margin-bottom: 10px;
         color: #ff6b35;
     }
 
@@ -564,11 +545,6 @@
     .game-categories {
         grid-template-columns: 1fr;
         gap: 40px;
-    }
-
-    .map-legend {
-        position: static;
-        margin-top: 20px;
     }
 
     /* Header Mobile */

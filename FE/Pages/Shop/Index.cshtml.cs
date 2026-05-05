@@ -8,7 +8,8 @@ namespace FE.Pages.Shop
     {
         private readonly ILogger<ShopIndexModel> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
-
+        private const string FirebasePrefix = "https://firebasestorage.googleapis.com/";
+        private const string ItemPathSegment = "images%2Fitems%2F";
         public ShopIndexModel(ILogger<ShopIndexModel> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
@@ -45,6 +46,11 @@ namespace FE.Pages.Shop
 
                 if (items != null && items.Count > 0)
                 {
+                    foreach (var item in items)
+                    {
+                        item.ImagePath = Normalize(item.ImagePath);
+                    }
+
                     // Group items by category
                     ShopItemsByCategory = items
                         .Where(item => item.IsActive)
@@ -61,6 +67,32 @@ namespace FE.Pages.Shop
                 _logger.LogError(ex, "Error loading shop items");
                 ErrorMessage = "An error occurred while loading shop items.";
             }
+        }
+        private static string Normalize(string? imagePath)
+        {
+            if (string.IsNullOrWhiteSpace(imagePath) ||
+                !imagePath.StartsWith(FirebasePrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return imagePath ?? string.Empty;
+            }
+
+            var queryIndex = imagePath.IndexOf('?', StringComparison.Ordinal);
+            if (queryIndex < 0)
+            {
+                return imagePath;
+            }
+
+            var basePath = imagePath[..queryIndex];
+            if (!basePath.Contains(ItemPathSegment, StringComparison.OrdinalIgnoreCase) ||
+                basePath.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                basePath.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                basePath.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                basePath.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
+            {
+                return imagePath;
+            }
+
+            return $"{basePath}.jpg{imagePath[queryIndex..]}";
         }
     }
 }

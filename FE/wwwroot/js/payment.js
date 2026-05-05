@@ -1,4 +1,4 @@
-﻿// payment.js — shared across all payment pages
+// payment.js — shared across all payment pages
 
 const API_BASE = window.API_BASE || '/Payment/Proxy';
 
@@ -84,7 +84,7 @@ async function loadPackages() {
                 ${bonusVp > 0 ? `<div class="pkg-bonus-badge">+${formatVp(bonusVp)}</div>` : ''}
                 <div class="pkg-icon-wrap">
                     <div class="pkg-icon-bg">
-                        <img src="/images/virtual-currency.png" alt="VP"
+                        <img src="https://firebasestorage.googleapis.com/v0/b/ashen-light-rpg.firebasestorage.app/o/images%2Fvirtual-currency.png?alt=media" alt="VP"
                              style="width:28px;height:28px;object-fit:contain;" />
                     </div>
                 </div>

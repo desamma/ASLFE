@@ -52,7 +52,7 @@
                         @if (!string.IsNullOrEmpty(news.BannerPath))
                         {
                             <div class="news-item-image">
-                                <img src="/images/@news.BannerPath" alt="@news.Title" />
+                                <img src="@Model.ResolveBannerUrl(news.BannerPath)" alt="@news.Title" />
                                 <div class="news-item-overlay"></div>
                             </div>
                         }

@@ -10,9 +10,10 @@
 /* Main Container */
 .profile-container {
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba(10,10,10,0.55) 0%, rgba(26,26,26,0.65) 100%), url('/images/mhbackground.jpg') center/cover no-repeat;
+    background: linear-gradient(135deg, rgba(10,10,10,0.55) 0%, rgba(26,26,26,0.65) 100%), url('https://firebasestorage.googleapis.com/v0/b/ashen-light-rpg.firebasestorage.app/o/images%2Fmhbackground.jpg?alt=media') center/cover no-repeat;
     padding: 40px 20px;
     margin-top: 4rem;
+    color: #000 !important;
 }
 
 /* Error State */
@@ -251,7 +252,7 @@
 
 .preview-label {
     font-weight: 600;
-    color: var(--text-primary);
+    color: #333;
     margin-bottom: 0.75rem;
     font-size: 0.9rem;
 }
@@ -267,7 +268,7 @@
 .section-title {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #333;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid var(--light-bg);
@@ -281,7 +282,7 @@
 .form-label {
     display: block;
     font-weight: 600;
-    color: var(--text-primary);
+    color: #333;
     margin-bottom: 0.5rem;
     font-size: 0.95rem;
     letter-spacing: 0.3px;

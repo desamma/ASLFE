@@ -13,7 +13,7 @@
 /* Items Header */
 .items-header {
     background: linear-gradient(135deg, #1a0a00 0%, #4a1a00 50%, #2a0a00 100%);
-    background-image: url('/images/shop-header-bg.jpg');
+    background-image: url('https://firebasestorage.googleapis.com/v0/b/ashen-light-rpg.firebasestorage.app/o/images%2Fshop-header-bg.jpg?alt=media');
     background-size: cover;
     background-position: center;
     background-blend-mode: overlay;
